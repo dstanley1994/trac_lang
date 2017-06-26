@@ -1,0 +1,60 @@
+
+Reverse A Form
+--------------
+This returns the reversed value of a form.  
+
+#(DS,reverse,
+(#(DS,[reverse],
+  (#(EQ,<c>,**,
+    (##(b)#(DD,b)),
+    (#(DS,b,<c>##(b))#([reverse],#(CC,<a>,**)))
+  ))
+#(SS,[reverse],<c>)
+#(CR,<a>)
+#([reverse],#(CC,<a>,**))
+)
+#(SS,reverse,<a>)
+
+Times
+-----
+Execute something a number of times.  The action can be a
+simple string or something more complicated.
+
+#(DS,times,
+  (#(EQ,<n>,0,,
+    (<action>#(times,#(SB,<n>,1),(<action>)))
+  ))
+)
+#(SS,times,<n>,<action>)
+
+
+Character Count
+---------------
+Count the number of characters in a form.  This is probably the most
+involved thing that I wish was a primitive in TRAC.  There isn't a
+code golf challenge that doesn't require this, and if it was a primitive
+TRAC might actually have a chance.
+
+This really counts from the form pointer to the end, and sets the form
+pointer at the end of the string as a side effect.  So if you want the
+real length, you have to call CR beforehand.
+
+#(DS,count,
+(#(EQ,#(CC,<f>,**),**,<tot>,
+  (#(count,<f>,#(AD,1,<tot>)))
+)))
+#(SS,count,<f>)
+
+
+Move To End
+-----------
+
+Move to the end of a form.  This is relatively simple, but it sure would be
+nice to have a primitive that could do this, the way CR can move to the start
+of a form.
+
+#(DS,end,
+(#(EQ,##(CC,<form>,**),**,,
+  (#(end,<form>))
+)))
+#(SS,end,<form>)

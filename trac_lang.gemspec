@@ -6,12 +6,12 @@ require 'trac_lang/version'
 Gem::Specification.new do |spec|
   spec.name          = "trac_lang"
   spec.version       = TracLang::VERSION
-  spec.authors       = ["TODO: Write your name"]
-  spec.email         = ["TODO: Write your email address"]
+  spec.authors       = ["David Stanley"]
+  spec.email         = ["dstanley1994@yahoo.com"]
 
-  spec.summary       = %q{TODO: Write a short summary, because Rubygems requires one.}
-  spec.description   = %q{TODO: Write a longer description or delete this line.}
-  spec.homepage      = "TODO: Put your gem's website or public repo URL here."
+  spec.summary       = %q{Ruby implementation of the TRAC computer language.}
+  spec.description   = %q{TRAC is a macro language invented in the 1950s.}
+  #spec.homepage      = "TODO: Put your gem's website or public repo URL here."
   spec.license       = "MIT"
 
   # Prevent pushing this gem to RubyGems.org. To allow pushes either set the 'allowed_push_host'

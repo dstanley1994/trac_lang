@@ -1,0 +1,49 @@
+Meta Programming
+
+How To Define EQ From Other Things
+
+#(DS,"eq",
+(#(DS,(a),(F))
+#(DS,(b),(T))
+##(CL,(a))))
+#(SS,"eq",a,b,T,F)
+
+If a and b are equal, the second call to DS will override the first one.
+
+Swap command in form
+--------------------
+You can swap something in a form, changing
+what it does, as long as you know what the
+arguments are.  Suppose you have a sort
+procedure that sorts ascending.  Just do
+#(swap,GR,LT,sorter,(arg1,arg2,...))
+and now it sorts descending.
+
+#(DS,swap,
+(#(DS,<f>,##(<f>,<args>))
+#(SS,<f>,<old>)
+#(DS,<f>,##(<f>,<new>))
+#(SS,<f>,<args>)))
+#(SS,swap,<old>,<new>,<f>,<args>)
+
+Find Maximum Segment Gap
+------------------------
+You can't really find the maximum segment gap inside TRAC.  Because people
+can skip over a segment gap by having a empty string as an argument to SS,
+there's no way to know if you've gotten to the end of the segment gaps.
+This assumes that all segment gaps are sequential with no skipping.
+
+Curry
+-----
+
+To curry is to make a new function 
+
+#(DS,curry,
+(#(DAS,<y>,
+  (#(<f>,<x>,<y>))
+)))
+#(SS,curry,<f>,<x>)
+
+Usage
+
+#(#(curry,f,x),y)

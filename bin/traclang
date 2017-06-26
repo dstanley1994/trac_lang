@@ -1,0 +1,61 @@
+#!/usr/bin/env ruby
+
+$:.unshift File.dirname(__FILE__) + '/../lib'
+require 'optparse'
+require 'traclang'
+
+USAGE_INSTRUCTIONS = ''
+  
+def parse_options
+  options = {}
+  op = OptionParser.new do |opt|
+    opt.banner = 'Usage: traclang.rb [OPTIONS] file1.trl file2.trl...'
+    options[:save_dir] = Dir.pwd
+    options[:save_dir] = ENV['TRAC-HOME'] if ENV['TRAC-HOME']
+    opt.on('-d', '--save-dir', 'Directory to save TRAC blocks to') do |dir|
+      options[:save_dir] = dir
+    end
+    exit_on_eof = false
+    opt.on('-x', '--exit-on-eof', 'Exit when finished processing files') do
+      exit_on_eof = true
+    end
+    options[:trace] = false
+    opt.on('-t', '--trace', 'Turn on trace') do
+      options[:trace] = true
+    end
+    opt.on( '-h', '--help', 'Display this screen' ) do
+      puts opt
+      exit
+    end
+  end
+  USAGE_INSTRUCTIONS << op.to_s
+  op.parse!
+  options
+end
+
+def print_error(error)
+  case error
+  when OptionParser::InvalidOption
+    puts "traclang: illegal option #{error.args.join(' ')}"
+    puts USAGE_INSTRUCTIONS
+  else
+    puts "An unexpected error occured while running TRAC Lang"
+    puts "  #{error}\n"
+  end
+end
+
+begin 
+  e = Executor.new(Dispatch.new(Bindings.new, parse_options))
+  catch :done do
+    ARGF.each_line do |line|
+      e.load(ARGF.filename, ARGF.lineno, line)
+    end
+    exit if exit_on_eof
+    e.prompt
+  end
+  puts 'Exiting...'
+  puts
+rescue => error
+  print_error(error)
+  exit(false)
+end

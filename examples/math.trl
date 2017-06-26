@@ -1,0 +1,66 @@
+
+Modulo
+------
+
+#(DS,mod,(#(SU,<a>,#(ML,<b>,#(DV,<a>,<b>)))))
+#(SS,mod,<a>,<b>)
+
+
+Decimal to Octal
+----------------
+Recursively convert a decimal number to octal.
+
+#(DS,to_oct,(
+  #(EQ,<dec>,0,,(#(to_oct,#(DV,<dec>,8))#(mod,<dec>,8)))
+))
+#(SS,to_oct,<dec>)
+
+
+Octal to Decimal
+----------------
+This one is a little more involved.  
+
+#(DS,to_dec,(
+  #(DS,[octal],<octal>)
+  #(DS,[to_dec],(
+    #(EQ,<digit>,end,(#(DD,[octal],[to_dec])<result>),(
+      #([to_dec],#(AD,<digit>,#(ML,8,<result>)),#(CC,[octal],end))
+    ))
+  ))
+  #(SS,[to_dec],<result>,<digit>)
+))
+#(SS,to_dec,<octal>)
+
+
+Absolute Value
+--------------
+Notice I negate a negative number by multiplying
+by negative one.  The order in the #(ML) command
+is important to preserve any prefix the number 
+might have.
+
+#(DS,abs,
+(#(GR,0,n,#(ML,n,-1),n)))
+#(SS,abs,n)
+
+
+Less Than
+---------
+
+#(DS,LT,
+(#(GR,a,b,(F),(T))))
+#(SS,LT,a,b,T,F)
+
+
+Numeric Equal
+-------------
+The EQ command in TRAC compares strings, not numbers.
+To compare numbers you need to use the GR command.
+If neither of two numbers is greater then they must
+be equal.
+
+#(DS,EQN,
+(#(GR,<a>,<b>,(F),
+#(GR,<b>,<a>,(F),(T))
+#(DS,EQN,<a>,<b>,T,F)
+
