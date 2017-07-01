@@ -73,6 +73,9 @@ RSpec.describe Block do
       ary = []
       b.each { |n, v| ary << n }
       expect(ary).to eq(['a', 'c'])
+      ary = []
+      b.each { |n, v| ary << v }
+      expect(ary).to eq(['b', 'd'])
     end
   end
   
