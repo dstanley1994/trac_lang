@@ -27,7 +27,7 @@ module TracLang
         f.puts "TRAC Lang Version #{VERSION}"
         f.puts "Saved: #{Time.now}"
         f.puts
-        bindings.each { |name, form| f.puts(form.to_trac(name)) }
+        bindings.each { |name, form| f.puts(form.to_trac(name)) if form }
       end
     end
     
