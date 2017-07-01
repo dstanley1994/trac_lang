@@ -32,7 +32,12 @@ module TracLang
     
     def highline
       chr = @getchar[].chr
-      STDOUT.write chr
+      case chr
+      when "\r" then puts
+      when "\u0003" then throw :done
+      else
+        STDOUT.write chr
+      end
       chr
     end
     
