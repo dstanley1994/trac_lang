@@ -65,6 +65,17 @@ RSpec.describe Block do
       expect(b.fetch('c')).to eq(nil)
     end
   end
+  
+  describe 'each' do
+    it 'enumerates all bindings' do
+      b = Bindings.new(['a', 'b'], ['c', 'd'])
+      expect(b.each).to be_instance_of(Enumerator)
+      ary = []
+      b.each { |n, v| ary << n }
+      expect(ary).to eq(['a', 'c'])
+    end
+  end
+  
 end
 
 end

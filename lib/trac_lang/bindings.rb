@@ -4,6 +4,7 @@ module TracLang
 
   # Binding of name to Form represented by the name.
   class Bindings
+    include Enumerable
 
     # Hash map of names to Forms.
     attr_reader :bindings
@@ -43,6 +44,9 @@ module TracLang
       @bindings.delete(name)
     end
     
+    def each(&blk)
+      @bindings.each(&blk)
+    end
   end
   
 end
