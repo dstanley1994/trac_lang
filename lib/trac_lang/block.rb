@@ -9,8 +9,8 @@ module TracLang
     # commands in it, as well as ordinary text, which will be ignored.
     # The options for trace and savedir will be inherited from the Dispatch
     # calling this method.
-    def self.read(filename, root, **options)
-      e = Executor.new(Dispatch.new(root, options))
+    def self.read(filename, **options)
+      e = Executor.new(Dispatch.new(options))
       File.new(filename, 'r') do |f|
         break unless e.load(filename, $., f.gets)
       end

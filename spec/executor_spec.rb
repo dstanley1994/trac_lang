@@ -6,8 +6,7 @@ RSpec.describe Executor do
 
   describe 'execute' do
     before do
-      @b = Bindings.new
-      @e = Executor.new(Dispatch.new(@b, {}))
+      @e = Executor.new
     end
     
     context 'valid string' do
@@ -40,8 +39,7 @@ RSpec.describe Executor do
   
   describe 'load' do
     before do
-      @b = Bindings.new
-      @e = Executor.new(Dispatch.new(@b, {}))
+      @e = Executor.new
     end
     
     context 'meta char received' do

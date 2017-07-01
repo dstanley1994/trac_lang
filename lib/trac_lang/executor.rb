@@ -1,26 +1,35 @@
 
-require 'io/console'
-
 module TracLang
 
   # Executable TRAC commands
   class Executor
 
     # Initialize executor, giving block to store forms in
-    def initialize(d)
+    def initialize(d = nil)
       @parser = Parser.new
-      @dispatch = d
+      @dispatch = d || Dispatch.new
     end
 
     # Executes TRAC from an interactive prompt. 
     def prompt
       puts "TRAC Emulator #{VERSION}"
       puts
-      idle = "#(PS,#(RS)\n)"
-      loop do
-        catch :reset do
-          execute(idle)
+      catch :done do
+        loop do
+          idle = "#(PS,#(RS)\n)"
+          catch :reset do
+            execute(idle)
+          end
         end
+      end
+      puts 'Exiting...'
+      puts
+    end
+
+    # Executes TRAC from a file.
+    def load_file(filename)
+      File.new(filename, 'r').each.with_index do |line, lineno|
+        load(filename, lineno, line)
       end
     end
     
@@ -43,8 +52,9 @@ module TracLang
       @parser.parse(str) do |to_call|
         if @dispatch.trace
           puts to_call
-          c = IO.console.getch
+          c = ImmediateRead.new.getch
           throw :reset unless c == "\r"
+          puts
         end
         @dispatch.dispatch(to_call)
       end
