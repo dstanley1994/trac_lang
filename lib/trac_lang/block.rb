@@ -11,7 +11,7 @@ module TracLang
     # calling this method.
     def self.read(filename, **options)
       e = Executor.new(Dispatch.new(options))
-      File.new(filename, 'r') do |f|
+      File.open(filename, 'r') do |f|
         break unless e.load(filename, $., f.gets)
       end
     end
@@ -23,7 +23,7 @@ module TracLang
     # 4. #(SS) commands for each bound form that has segments
     # 5. A mix of #(CN) and #(CS) commands to position the form pointer
     def self.write(filename, bindings)
-      File.new(filename, "w") do |f|
+      File.open(filename, "w") do |f|
         f.puts "TRAC Lang Version #{VERSION}"
         f.puts "Saved: #{Time.now}"
         f.puts
