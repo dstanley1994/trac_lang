@@ -164,7 +164,7 @@ module TracLang
     def initialize(**options)
       @root = options[:bindings] || Bindings.new
       @trace = options[:trace] || false
-      @savedir = options[:savedir] || '.'
+      @savedir = options[:savedir] || './'
       @meta = "'"
     end
 
@@ -312,16 +312,17 @@ module TracLang
     
     # List names command.
     on :ln do |delimiter = ''|
-      return_value(@root.bindings.map { |b| b[0] }.join(delimiter))
+      return_value(@root.map { |n, v| n }.join(delimiter))
     end
   
     # Store block command.
     on :sb do |name, *fnames|
       if name
-        b = Bindings.new(fnames.map { |n| @root.fetch_binding(n) }.compact)
+        to_save = fnames.map { |n| @root.fetch_binding(n) }.compact
+        b = Bindings.new(*to_save)
         filename = @savedir + name + '.trl'
         Block.write(filename, b)
-        fnames.each { |n| @root.delete(fn) }
+        fnames.each { |n| @root.delete(n) }
         @root.add([name, Form.new(filename)])
       end
       return_empty

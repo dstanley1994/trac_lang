@@ -39,6 +39,20 @@ RSpec.describe Block do
       b = Bindings.new(['a', 'b'], ['c', 'd'])
       expect(b.fetch_binding('a')).to eq(['a', 'b'])
     end
+    
+    it 'can be used to create new binding' do
+      b = Bindings.new(['a', 'b'], ['c', 'd'])
+      names = b.map { |n, v| n }
+      names << 'e'
+      expect(names).to eq(['a', 'c', 'e'])
+      new_ary = names.map { |n| b.fetch_binding(n) }.compact
+      expect(new_ary).to eq([['a', 'b'], ['c', 'd']])
+      c = Bindings.new(*new_ary)
+      expect(c.bindings).to eq({'a' => 'b', 'c' => 'd'})
+      expect(c.fetch('a')).to eq('b')
+      expect(c.fetch('c')).to eq('d')
+      expect(c.fetch('e')).to eq(nil)
+    end
   end
   
   describe 'delete' do
