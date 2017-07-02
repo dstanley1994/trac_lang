@@ -28,8 +28,8 @@ module TracLang
 
     # Executes TRAC from a file.
     def load_file(filename)
-      File.new(filename, 'r').each.with_index do |line, lineno|
-        load(filename, lineno, line)
+      File.new(filename, 'r').each do |line|
+        break unless load(filename, $., line)
       end
     end
     
@@ -39,7 +39,10 @@ module TracLang
       catch :reset do
         @code += line
         i = @code.index(@dispatch.meta)
-        execute(@code.slice!(0...i)) if i
+        # explanation of odd indexing:
+        # slice everything off code including meta character
+        # then execute that slice, without the meta character
+        execute(@code.slice!(0..i)[0..-2]) if i
         return true
       end
       puts line
