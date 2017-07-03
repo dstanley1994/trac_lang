@@ -31,7 +31,7 @@ class Octal
   # Converts octal number to string.  Returns a string <size> digits long.
   def to_s
     if value < 0
-      sprintf("%0*.*o", size + 2, size + 2, value).slice(2..-1)
+      sprintf("%0*.*o", size + 3, size + 3, value).slice(3..-1)
     else
       sprintf("%0*.*o", size, size, value)
     end
@@ -58,6 +58,7 @@ class Octal
     result = Octal.new
     result.size = size
     result.value = ~value
+    result
   end
   
   # Shifts octal bits by the given amount.
@@ -72,7 +73,7 @@ class Octal
   def rotate(n)
     result = Octal.new
     result.size = size
-    bits = 3 * o.bit_size
+    bits = 3 * size
     bit_mask = 2 ** bits - 1
     if n.value < 0
       result.value = ((value >> -n.value) | (value << (bits + n.value))) & bit_mask
