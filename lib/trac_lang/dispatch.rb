@@ -272,10 +272,10 @@ module TracLang
           when :returning_value
             return_value(f.send(sym, *args))
           when :rescuing_eos_at
-            eos_result = args.slice!(pos)
+            eos_result = args.slice!(pos) || ''
             begin
               return_value(f.send(sym, *args))
-            rescue EndOfStringError
+            rescue TracLang::Form::EndOfStringError
               return_force(eos_result)
             end
           end
@@ -286,10 +286,10 @@ module TracLang
     dispatch_form(:segment_string, :returning_empty)
     dispatch_form(:call_return, :returning_empty)
     dispatch_form(:call_lookup, :returning_value)
-    dispatch_form(:call_character, :rescuing_eos_at, 1)
-    dispatch_form(:call_segment, :rescuing_eos_at, 1)
-    dispatch_form(:call_n, :rescuing_eos_at, 2)
-    dispatch_form(:in_neutral, :rescuing_eos_at, 2)
+    dispatch_form(:call_character, :rescuing_eos_at, 0)
+    dispatch_form(:call_segment, :rescuing_eos_at, 0)
+    dispatch_form(:call_n, :rescuing_eos_at, 1)
+    dispatch_form(:in_neutral, :rescuing_eos_at, 1)
     
     # Print form command.  
     on :pf do |name = ''|
