@@ -192,7 +192,7 @@ module TracLang
     
     # Print string command.  
     on :ps do |str = ''|
-      print str
+      print str.gsub(/\r/,"\n")
       return_empty
     end
       
