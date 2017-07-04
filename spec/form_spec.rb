@@ -387,6 +387,15 @@ RSpec.describe Form do
     
   end
   
+  describe 'to_s' do
+    context 'control characters' do
+      it 'converts them to escape sequences' do
+        f = Form.new("abc\ndef")
+        expect(f.to_s).to eq('<^>abc\\x0adef')
+      end
+    end
+  end
+  
 end
 
 end

@@ -239,7 +239,11 @@ class TracLang::Form
         str += "<#{n}>"
       end
       str += '<^>' if @cp == cp && @sp == s.length
-      str << @value[cp] if cp < @value.length
+      if cp < @value.length
+        c = @value[cp]
+        # escape non-printable characters
+        str << (c =~ /[[:print:]]/ ? c : sprintf("\\x%02.2x", c.ord))
+      end
     end
     str
   end
