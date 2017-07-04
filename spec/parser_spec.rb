@@ -4,7 +4,7 @@ module TracLang
 
   RSpec.describe Parser do
 
-    describe 'errors' do
+    describe 'parsing' do
 
       before do
         @p = Parser.new
@@ -33,6 +33,17 @@ module TracLang
       context 'given neutral expression without enclosing expression' do
         it 'ingores' do
           @p.parse('##(a)') { @empty_result }
+        end
+      end
+      
+      context 'given text' do
+        it 'ignores commas' do
+          @p.parse('hello, world #(PS,a)') do |e|
+            expect(e.active).to be true
+            expect(e.command).to eq(:ps)
+            expect(e.size).to eq(2)
+            @empty_result
+          end
         end
       end
       

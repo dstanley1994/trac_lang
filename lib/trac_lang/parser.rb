@@ -28,12 +28,6 @@ module TracLang
       end
     end
     
-    # Returns current expression, throws reset if no expression exists
-    def current
-      throw :reset if @expressions.empty?
-      @expressions.last
-    end
-    
     # Add character to current expression, ignore if no expression exists
     def concat(c)
       unless @expressions.empty?
@@ -58,7 +52,9 @@ module TracLang
         @handler = :parens
       when ','
         @leading = true
-        current.newarg
+        unless @expressions.empty?
+          @expressions.last.newarg
+        end
       when ')'
         @leading = false
         throw :reset if @expressions.empty?
