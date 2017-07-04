@@ -36,16 +36,20 @@ module TracLang
     # Executes a line of TRAC loaded from a file.
     def load(filename, lineno, line)
       @code ||= ''
+      to_exe = ''
       catch :reset do
         @code += line
         i = @code.index(@dispatch.meta)
         # explanation of odd indexing:
         # slice everything off code including meta character
         # then execute that slice, without the meta character
-        execute(@code.slice!(0..i)[0..-2]) if i
+        if i
+          to_exe = @code.slice!(0..i)[0...-1]
+          execute(to_exe)
+        end
         return true
       end
-      puts line
+      puts to_exe
       puts "Error on or before line #{lineno} of #{filename}"
       return false
     end

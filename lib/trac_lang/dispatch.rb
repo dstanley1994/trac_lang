@@ -331,7 +331,7 @@ module TracLang
     # Fetch block command.
     on :fb do |name = ''|
       f = @root.fetch(name)
-      Block.read(f.value, bindings: @root, savedir: @savedir, trace: @trace) if f
+      Block.read(f.value, self) if f
       return_empty
     end
 
