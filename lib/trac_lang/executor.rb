@@ -56,7 +56,7 @@ module TracLang
         if @dispatch.trace
           puts to_call
           c = ImmediateRead.new.getch
-          throw :reset unless c == "\r"
+          throw :reset unless c == "\n"
           puts
         end
         @dispatch.dispatch(to_call)
