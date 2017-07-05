@@ -1,31 +1,55 @@
 
-Reverse A Form
---------------
-This returns the reversed value of a form.  
+Scrub Whitespace
+----------------
+A problem with TRAC definitions is they're strings, and so if you add whitespace 
+to make them readable, your definition ends up with a lot of extraneous whitespace.
+Here are two forms to help out, one scrubs a single character out of your form; the
+other scrubs spaces, tabs and newlines.  Call these forms on your definitions before
+you call SS, otherwise your arguments will get messed up.
 
-#(DS,reverse,
-(#(DS,[reverse],
-  (#(EQ,<c>,**,
-    (##(b)#(DD,b)),
-    (#(DS,b,<c>##(b))#([reverse],#(CC,<a>,**)))
-  ))
-#(SS,[reverse],<c>)
-#(CR,<a>)
-#([reverse],#(CC,<a>,**))
-)
-#(SS,reverse,<a>)
+#(DS,return,(
+))'
+#(DS,scrub-char,
+(#(SS,<f>,(<c>))#(DS,<f>,##(CL,<f>))))
+#(SS,scrub-char,<f>,<c>)'
+#(DS,scrub,
+(#(scrub-char,<f>,##(return))#(scrub-char,<f>,(	))#(scrub-char,<f>,( ))))
+#(SS,scrub,<f>)'
+
+
+Special Characters
+------------------
+Another problem with TRAC is that some characters are special, and so can't be used
+normally.  This is especially true of the two editing characters - the forward slash
+and the at sign.  They can't be typed in, but since editing is not done when reading
+a file, they can be entered in a file.  So here are definitions for each.
+
+The meta character can be changed, so that a definition of the default meta character
+single quote can be made.  
+
+The hash or number sign can easily be protected by parentheses, so doesn't need a
+definition at all.  However, parentheses themselves can't be defined, either at a prompt
+or through a file.  
+
+#(DS,slash,/)'
+#(DS,at,@)'
+#(CM,*)'
+#(DS,quote,')*
+#(CM,')*
+
 
 Times
 -----
 Execute something a number of times.  The action can be a
 simple string or something more complicated.
 
-#(DS,times,
-  (#(EQ,<n>,0,,
-    (<action>#(times,#(SB,<n>,1),(<action>)))
+#(DS,times,(
+  #(EQ,<n>,0,,(
+    <action>#(times,#(SU,<n>,1),(<action>)))
   ))
 )
-#(SS,times,<n>,<action>)
+#(scrub,times)
+#(SS,times,<n>,<action>)'
 
 
 Character Count
@@ -39,22 +63,43 @@ This really counts from the form pointer to the end, and sets the form
 pointer at the end of the string as a side effect.  So if you want the
 real length, you have to call CR beforehand.
 
-#(DS,count,
-(#(EQ,#(CC,<f>,**),**,<tot>,
-  (#(count,<f>,#(AD,1,<tot>)))
-)))
-#(SS,count,<f>)
+#(DS,count,(
+  #(EQ,##(CC,<f>,**),**,<tot>,(
+    #(count,<f>,#(AD,1,<tot>))
+  ))
+))
+#(scrub,count)
+#(SS,count,<f>,<tot>)'
 
 
 Move To End
 -----------
-
 Move to the end of a form.  This is relatively simple, but it sure would be
 nice to have a primitive that could do this, the way CR can move to the start
 of a form.
 
-#(DS,end,
-(#(EQ,##(CC,<form>,**),**,,
-  (#(end,<form>))
-)))
-#(SS,end,<form>)
+#(DS,end,(
+  #(EQ,##(CC,<form>,**),**,,(
+    #(end,<form>)
+  ))
+))
+#(scrub,end)
+#(SS,end,<form>)'
+
+
+Reverse A Form
+--------------
+This returns the reversed value of a form.  
+
+#(DS,reverse,(
+  #(DS,[reverse],(
+    #(EQ,(<c>),**,(<r>),(
+      #([reverse],##(CC,<a>,**),(<c><r>)))
+    ))
+  )
+  #(SS,[reverse],<c>,<r>)
+  #([reverse],##(CC,<a>,**))#(DD,[reverse])
+))
+#(scrub,reverse)
+#(SS,reverse,<a>)'
+
