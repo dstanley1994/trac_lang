@@ -192,7 +192,7 @@ module TracLang
     
     # Print string command.  
     on :ps do |str = ''|
-      print str  #.gsub(/\r/,"\n")
+      print str
       return_empty
     end
       
@@ -208,7 +208,7 @@ module TracLang
         c = ImmediateRead.new.getch
         case c
         when @meta then break
-        when '/'   then str.slice!(-1)
+        when '\\'  then str.slice!(-1)
         when '@'   then str = ''
         else
           str << c
