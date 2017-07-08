@@ -11,7 +11,6 @@ module TracLang
     def parse(str, &blk)
       @active = str
       @handler = :reading
-      @leading = true
       @expressions = []
       loop do
         if @active.empty?
@@ -43,20 +42,16 @@ module TracLang
     def reading(c, &blk)
       case c
       when '#'
-        @leading = false
         @expressions.push Expression.new
         @handler = :start_proc
       when '('
-        @leading = false
         @nesting = 1
         @handler = :parens
       when ','
-        @leading = true
         unless @expressions.empty?
           @expressions.last.newarg
         end
       when ')'
-        @leading = false
         throw :reset if @expressions.empty?
         expression = @expressions.pop
         result = blk.call(expression)
@@ -65,11 +60,9 @@ module TracLang
         else
           concat(result[:value])
         end
-      when ' ', "\n", "\t", "\r"
-        # ignore leading whitespace
-        concat(c) unless @leading
+      when "\n", "\r"
+        # ignore cr and lf
       else
-        @leading = false
         concat(c)
       end
     end
