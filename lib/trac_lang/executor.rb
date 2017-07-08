@@ -16,7 +16,7 @@ module TracLang
       puts
       catch :done do
         loop do
-          idle = "#(PS,#(RS)\n)"
+          idle = "#(PS,#(RS)(\n))"
           catch :reset do
             execute(idle)
           end
