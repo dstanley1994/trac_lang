@@ -28,8 +28,12 @@ module TracLang
 
     # Executes TRAC from a file.
     def load_file(filename)
-      File.new(filename, 'r').each do |line|
-        break unless load(filename, $., line)
+      begin
+        File.new(filename, 'r').each do |line|
+          break unless load(filename, $., line)
+        end
+      rescue
+        puts "Error loading file #{filename}"
       end
     end
     
