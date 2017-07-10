@@ -1,49 +1,170 @@
 Meta Programming
 
-How To Define EQ From Other Things
+Anonymous functions
+-------------------
+This uses an internal index to create an "anonymous" form and 
+return its name.  Since it returns the name of the "anonymous" 
+function, we can use the function as an object to pass to other
+scripts.
 
-#(DS,"eq",
-(#(DS,(a),(F))
-#(DS,(b),(T))
-##(CL,(a))))
-#(SS,"eq",a,b,T,F)
+#(DS,DAS,(
+  #(DS,fseq,#(AD,1,#(fseq)))
+  #(DS,f#(fseq),(<value>))
+  #(SS,f#(fseq),<args>)
+  f#(fseq)
+))
+#(sss,DAS,(<args>,<value>))'
 
-If a and b are equal, the second call to DS will override the first one.
+Since a non-existent form returns the empty string,
+and the empty string is the same as zero, we don't
+need to initialize fseq.
 
-Swap command in form
---------------------
-You can swap something in a form, changing
-what it does, as long as you know what the
-arguments are.  Suppose you have a sort
-procedure that sorts ascending.  Just do
-#(swap,GR,LT,sorter,(arg1,arg2,...))
-and now it sorts descending.
-
-#(DS,swap,
-(#(DS,<f>,##(<f>,<args>))
-#(SS,<f>,<old>)
-#(DS,<f>,##(<f>,<new>))
-#(SS,<f>,<args>)))
-#(SS,swap,<old>,<new>,<f>,<args>)
-
-Find Maximum Segment Gap
-------------------------
-You can't really find the maximum segment gap inside TRAC.  Because people
-can skip over a segment gap by having a empty string as an argument to SS,
-there's no way to know if you've gotten to the end of the segment gaps.
-This assumes that all segment gaps are sequential with no skipping.
 
 Curry
 -----
 
-To curry is to make a new function 
+Currying is to take a script that takes multiple arguments, fill in some
+of its arguments and return a script that will take the rest of the necessary
+arguments and can be called at a later time.
 
-#(DS,curry,
-(#(DAS,<y>,
-  (#(<f>,<x>,<y>))
-)))
-#(SS,curry,<f>,<x>)
+#(DS,curry,(#(DAS,(<y>),##(CL,<f>,<x>,<y>))))
+#(SS,curry,<f>,<x>)'
 
-Usage
+Usage:
 
-#(#(curry,f,x),y)
+(
+  #(DS,func,#(curry,multi-arg-func,(a,b,c)))
+  ...
+  #(#(func),(some,more,args))
+  
+  Or another more concrete example:
+  
+  #(DS,mult,(#(ML,a,b)))
+  #(SS,mult,a,b)
+  #(DS,times5,#(curry,mult,5))
+  #(#(times5),6)  ==> 30
+  #(#(times5),13) ==> 65
+)
+
+Combinators
+-----------
+
+TRAC can't support real combinators, since it doesn't have truly anonymous 
+functions.  But with a little creativity, you can create something that 
+looks an awful lot like the Y combinator, and does the same kind of work.
+
+Of course these combinators aren't necessary for TRAC.  TRAC already supports
+recursion, so there's no need to create a script that can make scripts recursive.
+However, this does show the power of TRAC and it also helps clear up some of 
+the mystique of these combinators.
+
+U Combinator
+------------
+The U combinator takes as an argument the name of a script whose only argument 
+is a script name.
+
+#(DS,U,(#(<f>,<f>)))
+#(SS,U,<f>)'
+
+Using the U combinator we can create a recursive function
+from a special sort of function.  Here's an example for
+calculating the factorial.
+
+(
+#(DS,fact,(
+  #(DAS,<n>,(
+    #(EQ,<n>,0,1,(
+      #(ML,<n>,#(#(U,<f>),#(SU,<n>,1)))
+    ))
+  ))
+))
+#(sss,fact,<f>)
+#(DS,!,(#(#(U,fact),<n>)))
+#(SS,!,<n>)
+)
+
+How does the U combinator work?  If you turn trace on and trace through the
+operation of ! you get a good idea of what's happening.  The "fact" script
+creates an anonymous function which does the work of testing the end condition
+and setting up the multiplication necessary. The U combinator passes a 
+script to itself, allowing it to call itself without direct recursion.  The 
+doubling in the U combinator is what makes the recursion work.  It passes a
+copy of the script to be called to itself.  
+
+The U combinator must be called inside the script that's being made recursive,
+which isn't as neat as we would like.  If we factor the U combinator out of 
+our script, we get the famous Y combinator.
+
+
+Y Combinator
+------------
+
+This version of the Y combinator uses the U combinator in its definition.  
+Pass in a script that takes a single argument and returns the name of a script.  
+Looking at it this way and comparing it to the factorial definition above helps
+make it understandable.  The outer U corresponds to the U in the definition
+of !, while the inner U corresponds to the U in the definition of fact.  The 
+definition of an anonymous function is necessary because that's the only real
+way TRAC has of passing a function around as an object.  As a result this creates
+a lot of identical anonymous functions.
+
+#(DS,Y,(
+  #(U,(
+    #(DAS,<x>,(
+      #(<f>,(#(U,<x>)))
+    ))
+  ))
+))
+#(sss,Y,<f>)'
+
+
+Y Combinator w/o U
+------------------
+Here's the closest TRAC is going to get to having a real Y combinator.  We take the 
+version of Y above and expand the definition of the U combinator.  If you've seen
+the Y combinator in other forms, you will see the resemblance here.  
+
+#(DS,Y,(
+  #(DAS,<x>,(
+    #(<f>,(#(<x>,<x>)))
+  )),#(DAS,<x>,(
+    #(<f>,(#(<x>,<x>)))
+  ))
+))
+#(sss,Y,<f>)'
+
+What's interesting is how the Y combinator is thought of as an airy abstraction in computing,
+but here it's being defined in a language which is nothing but strings, which is about as
+concrete as you can get.
+
+Here's how you would create the factorial function using the Y combinator.  We create a
+script that takes an anonymous function as an argument and returns a new anonymous function.  
+The anonymous function returned takes a single integer argument and returns one if the input 
+was zero, otherwise multiplies the input by the output of the script passed in.
+
+(
+#(DS,fact,(
+  #(DAS,<n>,(
+    #(EQ,<n>,0,1,(
+      #(ML,<n>,#(<f>,#(SU,<n>,1)))
+    ))
+  ))
+))
+#(sss,fact,<f>)
+#(DS,!,(#(#(Y,fact),<n>)))
+#(SS,!,<n>)
+)
+
+Here's how you would count characters in a form using the Y combinator.
+(
+#(DS,count,(
+  #(DAS,<s>,(
+    #(EQ,#(CC,<s>,**),**,0,(
+      #(AD,1,#(<f>,<s>))
+    ))
+  ))
+))
+#(sss,count,<f>)
+#(DS,*,(#(#(Y,count),<s>)))
+#(SS,*,<s>)
+)
