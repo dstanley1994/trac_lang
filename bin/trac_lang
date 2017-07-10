@@ -2,7 +2,7 @@
 
 $:.unshift File.dirname(__FILE__) + '/../lib'
 require 'optparse'
-require 'traclang'
+require 'trac_lang'
 
 USAGE_INSTRUCTIONS = ''
   
@@ -17,7 +17,7 @@ def parse_options
     end
     exit_on_eof = false
     opt.on('-x', '--exit-on-eof', 'Exit when finished processing files') do
-      exit_on_eof = true
+      options[:exit_on_eof] = true
     end
     options[:trace] = false
     opt.on('-t', '--trace', 'Turn on trace') do
@@ -36,7 +36,7 @@ end
 def print_error(error)
   case error
   when OptionParser::InvalidOption
-    puts "traclang: illegal option #{error.args.join(' ')}"
+    puts "trac_lang: illegal option #{error.args.join(' ')}"
     puts USAGE_INSTRUCTIONS
   else
     puts "An unexpected error occured while running TRAC Lang"
@@ -45,12 +45,22 @@ def print_error(error)
 end
 
 begin 
-  e = Executor.new(Dispatch.new(Bindings.new, parse_options))
+  d = TracLang::Dispatch.new(parse_options)
+  e = TracLang::Executor.new(d)
   catch :done do
+    last_file = ''
+    last_line = 0
+    current_line = 1
     ARGF.each_line do |line|
-      e.load(ARGF.filename, ARGF.lineno, line)
+      if ARGF.filename != last_file
+        current_line = 1
+        last_file = ARGF.filename
+      else
+        current_line += 1
+      end
+      e.load(ARGF.filename, current_line, line)
     end
-    exit if exit_on_eof
+    exit if parse_options[:exit_on_eof]
     e.prompt
   end
   puts 'Exiting...'
