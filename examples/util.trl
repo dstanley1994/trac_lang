@@ -3,25 +3,40 @@ Scrub Whitespace
 ----------------
 A problem with TRAC definitions is they're strings, and so if you add whitespace 
 to make them readable, your definition ends up with a lot of extraneous whitespace.
-Here are two forms to help out, one scrubs a single character out of your form; the
-other scrubs spaces, tabs and newlines.  Call these forms on your definitions before
-you call SS, otherwise your arguments will get messed up.
+Carriage return and line feed are normally ignored if they aren't protected, so they
+don't need to be removed, but spaces and tabs aren't.  So here are some scripts to 
+help out:
 
-#(DS,return,(
-))'
-#(DS,scrub-char,
-(#(SS,<f>,(<c>))#(DS,<f>,##(CL,<f>))))
-#(SS,scrub-char,<f>,<c>)'
-#(DS,scrub,
-(#(scrub-char,<f>,##(return))#(scrub-char,<f>,(	))#(scrub-char,<f>,( ))))
-#(SS,scrub,<f>)'
+scrub-char
+	scrubs a single character out of your script
+
+	#(DS,scrub-char,(#(SS,<f>,(<c>))#(DS,<f>,##(CL,<f>))))
+	#(SS,scrub-char,<f>,<c>)'
+
+scrub
+	scrubs spaces and tabs out of your script
+	
+	#(DS,scrub,(#(scrub-char,<f>,(	))#(scrub-char,<f>,( ))))
+	#(SS,scrub,<f>)'
+
+Call these scripts on your definitions before you call SS, otherwise your arguments 
+will get messed up.  To make that easier to do:
+
+sss	scrubs your script and then segments according to the args you pass
+
+	#(DS,sss,(#(scrub,<f>)#(SS,<f>,<args>)))
+	#(SS,sss,<f>,<args>)'
+
+If you use this for a script that has multiple arguments, protect the argument list with
+parentheses, otherwise TRAC will think your arguments are extra arguments for sss, instead
+of for SS.  Remember TRAC is only passing around strings, not data structures.
 
 
 Special Characters
 ------------------
 Another problem with TRAC is that some characters are special, and so can't be used
-normally.  This is especially true of the two editing characters - the forward slash
-and the at sign.  They can't be typed in, but since editing is not done when reading
+normally.  This is especially true of the two editing characters - 
+the "\" and the "@".  They can't be typed in, but since editing is not done when reading
 a file, they can be entered in a file.  So here are definitions for each.
 
 The meta character can be changed, so that a definition of the default meta character
@@ -31,11 +46,21 @@ The hash or number sign can easily be protected by parentheses, so doesn't need 
 definition at all.  However, parentheses themselves can't be defined, either at a prompt
 or through a file.  
 
-#(DS,slash,/)'
+#(DS,backslash,\)'
 #(DS,at,@)'
 #(CM,*)'
 #(DS,quote,')*
 #(CM,')*
+
+Some important characters:
+
+#(DS,return,(
+))'
+#(DS,tab,	)'
+#(DS,space, )'
+#(DS,bell,)'
+#(DS,escape,)'
+#(DS,backspace,)'
 
 
 Times
@@ -48,8 +73,7 @@ simple string or something more complicated.
     <action>#(times,#(SU,<n>,1),(<action>)))
   ))
 )
-#(scrub,times)
-#(SS,times,<n>,<action>)'
+#(sss,times,(<n>,<action>))'
 
 
 Character Count
@@ -64,12 +88,11 @@ pointer at the end of the string as a side effect.  So if you want the
 real length, you have to call CR beforehand.
 
 #(DS,count,(
-  #(EQ,##(CC,<f>,**),**,<tot>,(
+  #(EQ,##(CC,<f>,--),--,<tot>,(
     #(count,<f>,#(AD,1,<tot>))
   ))
 ))
-#(scrub,count)
-#(SS,count,<f>,<tot>)'
+#(sss,count,(<f>,<tot>))'
 
 
 Move To End
@@ -79,27 +102,30 @@ nice to have a primitive that could do this, the way CR can move to the start
 of a form.
 
 #(DS,end,(
-  #(EQ,##(CC,<form>,**),**,,(
+  #(EQ,##(CC,<form>,--),--,,(
     #(end,<form>)
   ))
 ))
-#(scrub,end)
-#(SS,end,<form>)'
+#(sss,end,<form>)'
 
 
-Reverse A Form
---------------
-This returns the reversed value of a form.  
+List Forms With Prefix
+----------------------
 
-#(DS,reverse,(
-  #(DS,[reverse],(
-    #(EQ,(<c>),**,(<r>),(
-      #([reverse],##(CC,<a>,**),(<c><r>)))
+One way to organize the list of defined forms is to prefix the name of related
+forms with a certain value.  For instance, all the color code definitions in the
+term.trl file are prefixed with "clr-".  This script allows you to list the only
+those forms.  I use "-END-" as a delimiter, so if you use that as a form name
+or part of a form name, this is not going to work right.
+
+#(DS,list-prefix,(
+  #(DS,names,#(LN,-END-))
+  #(SS,names,-END-)
+  #(DS,[list],(
+    #(EQ,#(IN,names,<prefix>,-END-),-END-,,(
+      #(CS,names)(<delimiter>)#([list])
     ))
-  )
-  #(SS,[reverse],<c>,<r>)
-  #([reverse],##(CC,<a>,**))#(DD,[reverse])
+  ))
+  #([list])#(DD,names,[list])
 ))
-#(scrub,reverse)
-#(SS,reverse,<a>)'
-
+#(sss,list-prefix,(<prefix>,<delimiter>))'

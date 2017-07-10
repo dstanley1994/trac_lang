@@ -1,55 +1,29 @@
 
-Modulo
-------
-
-#(DS,mod,(#(SU,<a>,#(ML,<b>,#(DV,<a>,<b>)))))
-#(SS,mod,<a>,<b>)
-
-
-Decimal to Octal
-----------------
-Recursively convert a decimal number to octal.
-
-#(DS,to_oct,(
-  #(EQ,<dec>,0,,(#(to_oct,#(DV,<dec>,8))#(mod,<dec>,8)))
-))
-#(SS,to_oct,<dec>)
-
-
-Octal to Decimal
-----------------
-This one is a little more involved.  
-
-#(DS,to_dec,(
-  #(DS,[octal],<octal>)
-  #(DS,[to_dec],(
-    #(EQ,<digit>,end,(#(DD,[octal],[to_dec])<result>),(
-      #([to_dec],#(AD,<digit>,#(ML,8,<result>)),#(CC,[octal],end))
-    ))
-  ))
-  #(SS,[to_dec],<result>,<digit>)
-))
-#(SS,to_dec,<octal>)
-
 
 Absolute Value
 --------------
+
 Notice I negate a negative number by multiplying
 by negative one.  The order in the #(ML) command
 is important to preserve any prefix the number 
 might have.
 
-#(DS,abs,
-(#(GR,0,n,#(ML,n,-1),n)))
-#(SS,abs,n)
+#(DS,abs,(#(GR,0,n,#(ML,n,-1),n)))
+#(SS,abs,n)'
 
 
-Less Than
----------
+Sign
+----
 
-#(DS,LT,
-(#(GR,a,b,(F),(T))))
-#(SS,LT,a,b,T,F)
+Determine the sign of the given number.  Returns
+one, zero or negative one depending.
+
+#(DS,sgn,(
+  #(GR,0,n,-1,(
+    #(GR,n,0,1,0)
+  ))
+))
+#(sss,sgn,n)'
 
 
 Numeric Equal
@@ -59,8 +33,173 @@ To compare numbers you need to use the GR command.
 If neither of two numbers is greater then they must
 be equal.
 
-#(DS,EQN,
-(#(GR,<a>,<b>,(F),
-#(GR,<b>,<a>,(F),(T))
-#(DS,EQN,<a>,<b>,T,F)
+#(DS,eqn,(
+  #(GR,a,b,(F),(
+    #(GR,b,a,(F),(T))
+  ))
+))
+#(sss,eqn,(a,b,T,F))'
+
+
+Modulo
+------
+
+Division in TRAC is floored division, so the modulo always has the same sign
+as the divisor.  The "mod+" script calculates the modulo for positive numbers, 
+while the "mod" script calculates it for all numbers.  If there was a way to
+change the sign of TRAC numbers without using multiplication, then all 
+multiplication could be eliminated here.
+
+The "Z" parameter is returned when "b" is zero.  The "mod+" script does not 
+check for a "b" of zero, so will go into an infinite loop if you give it such
+a "b".
+
+#(DS,mod+,(
+  #(GR,<a>,<b>,(
+    #(mod+,#(SU,<a>,<b>),<b>)
+  ),<a>)
+))
+#(sss,mod+,(<a>,<b>))
+
+Check all the combinations of sign "a" and "b" can have, including a "b" of
+zero.  We don't need to check if "a" is zero, since zero modulo anything is
+just zero.
+
+#(DS,mod,(
+  #(GR,<a>,0,(
+    #(GR,<b>,0,(
+      #(mod+,<a>,<b>)
+    ),(
+      #(GR,0,<b>,(
+        #(AD,<b>,#(mod+,<a>,#(abs,<b>)))
+      ),(
+        Z
+      ))  
+    ))
+  ),(
+    #(GR,<b>,0,(
+      #(SU,<b>,#(mod+,#(abs,<a>),<b>))
+    ),(
+      #(GR,0,<b>,(
+        #(ML,#(mod+,#(abs,<a>),#(abs,<b>),(Z)),-1)
+      ),(
+        Z
+      ))
+    ))
+  ))
+))
+#(sss,mod,(<a>,<b>,Z))'
+
+
+Divides
+-------
+
+Test if one number divides another.  The "Z" parameter is returned if 
+"a" is zero.
+
+#(DS,div?,(
+  #(eqn,0,<a>,(Z),(
+    #(eqn,0,(#(mod,<b>,<a>)),(T),(F))
+  ))
+))
+#(sss,div?,(<a>,<b>,T,F,Z))'
+
+
+Ceiling
+-------
+
+TRAC division takes the floor of the division.  But sometimes you need
+the ceiling.  The "Z" parameter is returned if "b" is zero.
+
+#(DS,ceil,(
+  #(div?,<b>,<a>,(
+    #(DV,<a>,<b>)
+  ),(
+    #(AD,1,#(DV,<a>,<b>))
+  ),(
+    Z
+  ))
+))
+#(sss,ceil,(<a>,<b>,Z))'
+
+
+Decimal to Octal
+----------------
+Recursively convert a decimal number to octal.  This will go into an infinite
+loop if you try in on negative numbers.  That's because TRAC doesn't have a 
+specific word size, so a negative octal number has an infinite number of 7's
+in front of it.
+
+#(DS,to_oct,(#(eqn,<dec>,0,,(#(to_oct,#(DV,<dec>,8))#(mod,<dec>,8)))))
+#(SS,to_oct,<dec>)'
+
+
+Octal to Decimal
+----------------
+This one is more string-based.  Since I can't do numeric calculations
+with octals, I have to read the octal number as a string, character by
+character, and then interpret each character as a number.
+
+#(DS,to_dec,(
+  #(DS,[octal],<octal>)
+  #(DS,[to_dec],(
+    #(EQ,<digit>,--,
+      (#(DD,[octal],[to_dec])<result>),
+      (#([to_dec],##(CC,[octal],--),#(AD,<digit>,#(ML,8,<result>))))
+    )
+  ))
+  #(SS,[to_dec],<digit>,<result>)
+  #([to_dec],##(CC,[octal],--))
+))
+#(sss,to_dec,<octal>)'
+
+
+Random
+------
+
+Now we can define a random number generator.  Remember to define the seed
+value to an octal number before you call random the first time.
+
+#(DS,random,(
+  #(DS,seed,
+    #(BS,#(to_oct,
+      #(AD,1,#(ML,22695477,#(to_dec,#(seed))))
+    ),-16)
+  )
+  #(DS,seed,#(BI,#(seed),177777))
+  #(seed)
+))
+#(scrub,random)'
+
+One interesting thing to notice in this definition.  The "seed" is a number,
+not a script.  So I don't use protecting parentheses around its definition
+because I want the definition calculated immediately.  This is different from
+almost every other definition I've written in these files, which is why I 
+mention it.
+
+
+Power
+-----
+
+Recursive definition of raising a number to a given power.  Negative powers
+will return zero.
+
+#(DS,power,(
+  #(GR,0,<n>,0,(
+    #(GR,<n>,0,(
+      #(ML,<base>,#(power,<base>,#(SU,<n>,1)))
+    ),1)
+  ))
+))
+#(scrub,power)
+#(SS,power,<base>,<n>)'
+
+
+Power of Two
+------------
+
+This should be much faster than calling the usual power script.
+
+#(DS,power2,(#(to_dec,#(BS,1,n))))
+#(SS,power2,n)'
 

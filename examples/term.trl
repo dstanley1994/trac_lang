@@ -1,0 +1,121 @@
+
+The util.trl file needs to be loaded before this one.
+
+ANSI Escape Codes
+-----------------
+
+Here are some basic ANSI escape codes for controlling text appearance.  
+
+First we define the codes for effects:
+
+#(DS,define-effect,(
+  #(EQ,<number>,-END-,,(
+    #(DS,clr-#(CS,effect-list),<number>)
+    #(define-effect,#(CS,effect-list,-END-))
+  ))
+))
+#(scrub,define-effect)
+#(SS,define-effect,<number>)'
+
+#(DS,effect-list,(
+0 reset
+1 bright
+2 dim
+4 underscore
+5 blink
+7 reverse
+8 hidden))'
+
+#(SS,effect-list,( ),##(CL,return))'
+ 
+Discard first empty segment: #(CS,effect-list)'
+
+#(define-effect,#(CS,effect-list))'
+
+Next we define the codes for colors, foreground and background:
+
+#(DS,define-color,(
+  #(EQ,<number>,-END-,,(
+    #(define-colors,#(CS,color-list),<number>)
+    #(define-color,#(CS,color-list,-END-))
+  ))
+))
+#(scrub,define-color)
+#(SS,define-color,<number>)'
+
+#(DS,define-colors,(
+  #(DS,clr-<name>-fg,3<number>)
+  #(DS,clr-<name>-bg,4<number>)
+))
+#(scrub,define-colors)
+#(SS,define-colors,<name>,<number>)'
+
+#(DS,color-list,(
+0 black
+1 red
+2 green
+3 yellow
+4 blue
+5 magenta
+6 cyan
+7 white))
+
+#(SS,color-list,( ),##(CL,return))'
+
+Discard first empty segment:  #(CS,color-list)'
+
+#(define-color,#(CS,color-list))'
+
+#(DD,define-effect,define-color)'
+
+
+Now we define our script that will translate the names above into
+actual escape codes.  
+
+#(DS,color,(
+  #(DS,list,<list>)
+  #(SS,list,##(CL,space))
+  #(DS,read,(
+    #(clr-<s>)
+    #(next,#(CS,list,END))
+  ))
+  #(SS,read,<s>)
+  #(DS,next,(
+    #(EQ,<s>,END,,(;#(read,<s>)))
+  ))
+  #(SS,next,<s>)
+  #(escape)[#(read,#(CS,list,reset))m
+  #(DD,list,read,next)
+))
+#(sss,color,<list>)'
+
+Usage:
+(
+  #(color,bright red-fg blue-bg)
+  
+  Defaults to reset:  #(color)
+  
+  The escape codes need to be embedded in print commands to take effect, like so:
+  
+  #(PS,#(color,green-fg)I am green!#(color) I am not!)
+
+  Using these you can make templates for creating forms:
+  
+  #(DS,template,(
+  *label*Name:**	*field*<name>**
+  *label*Occupation:**	*field*<job>**
+  *label*Age:**		*field*<age>**
+  ))
+  
+  #(SS,template,**,*label*,*field*)
+  
+  #(DS,form,##(CL,template,#(color),#(color,bright),#(color,reverse)))
+  
+  #(SS,form,<name>,<job>,<age>)
+  
+  Now you can fill out the form multiple times, and it will print with the
+  format you decided on.  Notice that I used a neutral call on the template
+  when defining the form to protect the newlines in it.
+
+)
+      
