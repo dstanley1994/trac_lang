@@ -1,4 +1,7 @@
 
+Mathematics
+
+#(PS,Loading examples/math.trl...)'
 
 Absolute Value
 --------------
@@ -203,3 +206,5 @@ This should be much faster than calling the usual power script.
 #(DS,power2,(#(to_dec,#(BS,1,n))))
 #(SS,power2,n)'
 
+#(PS,(success!
+))'

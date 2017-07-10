@@ -1,4 +1,8 @@
 
+Basic Utilities
+
+#(PS,Loading examples/util.trl...)'
+
 Scrub Whitespace
 ----------------
 A problem with TRAC definitions is they're strings, and so if you add whitespace 
@@ -129,3 +133,6 @@ or part of a form name, this is not going to work right.
   #([list])#(DD,names,[list])
 ))
 #(sss,list-prefix,(<prefix>,<delimiter>))'
+
+#(PS,(success!
+))'

@@ -1,8 +1,7 @@
 
-The util.trl file needs to be loaded before this one.
-
 ANSI Escape Codes
------------------
+
+#(PS,Loading examples/term.trl...)'
 
 Here are some basic ANSI escape codes for controlling text appearance.  
 
@@ -118,4 +117,7 @@ Usage:
   when defining the form to protect the newlines in it.
 
 )
+
+#(PS,(success!
+))'
       

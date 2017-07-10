@@ -1,4 +1,7 @@
+
 Code Golf
+
+#(PS,Loading examples/golf.trl...)'
 
 TRAC is never going to win a Code Golf competition.  It's lack of primitives makes it difficult to do anything under a 
 hundred characters.  However, trying to figure out how to write certain things in TRAC does help you learn the ins and 
@@ -121,3 +124,5 @@ called "str" is required, so that neutral calls can be made on it.
 #(DS,reverse,(#(DS,str,)#([reverse],<a>)))
 #(SS,reverse,<a>)'
 
+#(PS,(success!
+))'

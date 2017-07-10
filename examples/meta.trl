@@ -1,4 +1,7 @@
+
 Meta Programming
+
+#(PS,Loading examples/meta.trl...)'
 
 Anonymous functions
 -------------------
@@ -168,3 +171,6 @@ Here's how you would count characters in a form using the Y combinator.
 #(DS,*,(#(#(Y,count),<s>)))
 #(SS,*,<s>)
 )
+
+#(PS,(success!
+))'
