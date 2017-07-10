@@ -1,0 +1,123 @@
+Code Golf
+
+TRAC is never going to win a Code Golf competition.  It's lack of primitives makes it difficult to do anything under a 
+hundred characters.  However, trying to figure out how to write certain things in TRAC does help you learn the ins and 
+outs of the language.  Below are a few of my attempts at some of the Code Golf challenges.
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+The Curious Case of Steve Ballmer - 158 characters
+
+#(DS,x,Steve Ballmer still does not know;what he did;wrong;with mobile)#(SS,x,;)#(DS,,(#(PS,(a.
+))#(EQ,b,.,,(#(,a b,#(CS,x,.))))))#(SS,,a,b)#(,#(CS,x),#(CS,x))'
+
+Ungolfed Version:
+
+(
+#(DS,sentence,Steve Ballmer still does not know;what he did;wrong;with mobile)
+#(SS,sentence,;)
+#(DS,print-phrase,
+  (#(PS,(<phrase>.
+))#(EQ,<next-phrase>,*END*,,(
+   #(print-phrase,<phrase> <next-phrase>,#(CS,sentence,*END*)))
+)))
+#(SS,print-phrase,<phrase>,<next-phrase>)
+#(print-phrase,#(CS,sentence),#(CS,sentence))
+)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+Am I A Secondary Taxi? - 219 characters
+
+#(DS,3,(#(ML,n,#(ML,n,n))))#(SS,3,n)#(DS,,(#(EQ,#(AD,#(3,i),#(3,j)),n,(#(DS,+,#(AD,1,#(+)))))))#(SS,,n,i,j)#(DS,x,(#(,n,i,j)#(EQ,j,n,(#(GR,#(+),1,T,F)),(#(EQ,i,n,(#(,n,1,#(AD,1,j))),(#(,n,#(AD,1,i),j)))))))#(SS,x,n,i,j)'
+
+Ungolfed version:
+
+(
+#(DS,cube,
+  (#(ML,<n>,#(ML,<n>,<n>))))
+#(SS,cube,<n>)
+
+#(DS,test,
+  (#(EQ,<n>,#(AD,#(cube,<i>),#(cube,<j>)),
+      (#(DS,total,#(AD,1,#(total)))))))
+#(SS,test,n,i,j)
+
+#(DS,taxi,
+  (#(test,<n>,<i>,<j>)
+   #(EQ,<j>,<n>,
+     (#(GR,#(total),1,T,F)),
+     (#(EQ,<i>,<n>,
+       (#(test,<n>,1,#(AD,1,<j>))),
+       (#(test,<n>,#(AD,1,<i>),<j>)))))))
+#(SS,taxi,<n>,<i>,<j>)
+)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+Unique Is Cheap - 99 characters
+
+Assume string to test is contained in form s:
+
+#(DS,$,(#(EQ,c,**,+,(#(DS,c,#(AD,1,#(c)))#($,#(CC,s,**),#(AD,+,#(c)))))))#(SS,$,c,+)#($,#(CC,s,**))'
+
+Ungolfed version:
+
+Assume string to test is contained in form "string":
+
+(
+#(DS,cost,
+(#(EQ,<c>,**,<total>,
+  (#(DS,<c>,#(AD,1,#(<c>)))
+   #(cost,#(CC,string,**),#(AD,<total>,#(<c>)))
+  )
+)))
+#(SS,cost,<c>,<total>)
+#(cost,#(CC,string,**))
+)
+
+---------------------------------------------------------------------------------------------------------------------------------------------
+Fewest (distinct) characters for Turing Completeness - 6 characters
+
+hash, open-paren, close-paren, comma, D and S
+
+With these six characters, you have the commands DS, SS, and DD.  
+
+How do you define branching?  We see on page .. of ...
+
+(
+#(DS,DDD,(#(DS,(DDS),(SDD))#(DS,(DSD),(DSS))#((DDS))))
+#(SS,DDD,DDS,DSD,DSS,SDD)
+)
+
+Ungolfed version:
+
+(
+#(DS,"eq",
+  (#(DS,(a),(F))
+   #(DS,(b),(T))
+   #((a))
+))
+#(SS,"eq",a,b,T,F)
+)
+
+If a equals b, then the definition of b will overwrite the definition of a, 
+
+
+Reverse A Form
+--------------
+This returns the reversed value of a form.  This will work on any form whether it has
+parentheses or not.  Because of the possibility of parentheses, an intermediate form
+called "str" is required, so that neutral calls can be made on it.  
+
+#(DS,[reverse],(
+  #(EQ,##(CC,<a>,--),--,
+    (##(CL,str)),
+    (#(,##(CN,<a>,-1))
+     #(DS,str,##(CC,<a>)##(CL,str))
+     #([reverse],<a>))
+  )
+))
+#(scrub,[reverse])
+#(sss,[reverse],<a>)'
+
+#(DS,reverse,(#(DS,str,)#([reverse],<a>)))
+#(SS,reverse,<a>)'
+
