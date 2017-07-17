@@ -3,23 +3,31 @@ Mathematics
 
 #(PS,Loading examples/math.trl...)'
 
+Negate
+------
+
+Notice I negate a negative number by multiplying by negative one.  The order in
+the #(ML) command is important to preserve any prefix the number might have.
+
+#(DS,-,(#(ML,n,-1)))
+#(SS,-,n)'
+
+
 Absolute Value
 --------------
 
-Notice I negate a negative number by multiplying
-by negative one.  The order in the #(ML) command
-is important to preserve any prefix the number 
-might have.
+Negate if you're less than zero.
 
-#(DS,abs,(#(GR,0,n,#(ML,n,-1),n)))
+#(DS,abs,(#(GR,0,n,#(-,n),n)))
 #(SS,abs,n)'
 
 
 Sign
 ----
 
-Determine the sign of the given number.  Returns
-one, zero or negative one depending.
+Determine the sign of the given number.  Returns one, zero or negative one
+depending.  Because these numbers don't have text prefixes, they can be
+compared with EQ.
 
 #(DS,sgn,(
   #(GR,0,n,-1,(
@@ -29,12 +37,25 @@ one, zero or negative one depending.
 #(sss,sgn,n)'
 
 
+Sign Case
+---------
+
+This creates a control statement which executes different code depending on
+what sign the given number is.  This simplifies some of our later code.
+
+#(DS,sgn?,(
+  #(GR,<a>,0,(P),(
+    #(GR,0,<a>,(N),(Z))
+  ))
+))
+#(sss,sgn?,(<a>,P,Z,N))
+
+
 Numeric Equal
 -------------
-The EQ command in TRAC compares strings, not numbers.
-To compare numbers you need to use the GR command.
-If neither of two numbers is greater then they must
-be equal.
+The EQ command in TRAC compares strings, not numbers.  To compare numbers you
+need to use the GR command.  If neither of two numbers is greater then they
+must be equal.
 
 #(DS,eqn,(
   #(GR,a,b,(F),(
@@ -60,34 +81,37 @@ a "b".
 #(DS,mod+,(
   #(GR,<a>,<b>,(
     #(mod+,#(SU,<a>,<b>),<b>)
-  ),<a>)
+  ),(
+    #(GR,<b>,<a>,<a>,0)
+  ))
 ))
 #(sss,mod+,(<a>,<b>))
 
-Check all the combinations of sign "a" and "b" can have, including a "b" of
-zero.  We don't need to check if "a" is zero, since zero modulo anything is
-just zero.
+Check all the combinations of sign "a" and "b" can have, including an "a" or
+"b" of zero.  If "a" is zero, just return "a", since anything modulo zero is
+zero.  This is consistent with DV so that:
+(
+  #(AD,#(ML,b,#(DV,a,b)),#(mod,a,b))  ==  a
+)
 
 #(DS,mod,(
-  #(GR,<a>,0,(
-    #(GR,<b>,0,(
+  #(sgn?,<a>,(
+    #(sgn?,<b>,(
       #(mod+,<a>,<b>)
     ),(
-      #(GR,0,<b>,(
-        #(AD,<b>,#(mod+,<a>,#(abs,<b>)))
-      ),(
-        Z
-      ))  
+      Z
+    ),(
+      #(AD,<b>,#(mod+,<a>,#(abs,<b>)))
     ))
   ),(
-    #(GR,<b>,0,(
+    <a>
+  ),(
+    #(sgn?,<b>,(
       #(SU,<b>,#(mod+,#(abs,<a>),<b>))
     ),(
-      #(GR,0,<b>,(
-        #(ML,#(mod+,#(abs,<a>),#(abs,<b>),(Z)),-1)
-      ),(
-        Z
-      ))
+      Z
+    ),(
+      #(-,#(mod+,#(abs,<a>),#(abs,<b>),(Z)))
     ))
   ))
 ))
@@ -97,8 +121,8 @@ just zero.
 Divides
 -------
 
-Test if one number divides another.  The "Z" parameter is returned if 
-"a" is zero.
+Test if one number divides another.  The "Z" parameter is returned if "a" is
+zero.
 
 #(DS,div?,(
   #(eqn,0,<a>,(Z),(
@@ -111,8 +135,8 @@ Test if one number divides another.  The "Z" parameter is returned if
 Ceiling
 -------
 
-TRAC division takes the floor of the division.  But sometimes you need
-the ceiling.  The "Z" parameter is returned if "b" is zero.
+TRAC division takes the floor of the division.  But sometimes you need the
+ceiling.  The "Z" parameter is returned if "b" is zero.
 
 #(DS,ceil,(
   #(div?,<b>,<a>,(
@@ -124,6 +148,36 @@ the ceiling.  The "Z" parameter is returned if "b" is zero.
   ))
 ))
 #(sss,ceil,(<a>,<b>,Z))'
+
+
+Euclidean Division
+------------------
+
+This division will truncate toward zero, instead of truncating down like normal
+TRAC division does.  The Z parameter is returned if b is zero.
+
+#(DS,DV+,(
+  #(sgn?,<b>,(
+    #(sgn?,<a>,(
+      #(DV,<a>,<b>)
+    ),(
+      <a>
+    ),(
+      #(-,#(DV,#(-,<a>),<b>))
+    ))
+  ),(
+    Z
+  ),(
+    #(sgn?,<a>,(
+      #(-,#(DV,<a>,#(-,<b>)))
+    ),(
+      <a>
+    ),(
+      #(DV,#(-,<a>),#(-,<b>))
+    ))
+  ))
+))
+#(sss,DV+,(<a>,<b>,Z))'
 
 
 Decimal to Octal
@@ -139,9 +193,9 @@ in front of it.
 
 Octal to Decimal
 ----------------
-This one is more string-based.  Since I can't do numeric calculations
-with octals, I have to read the octal number as a string, character by
-character, and then interpret each character as a number.
+This one is more string-based.  Since I can't do numeric calculations with
+octals, I have to read the octal number as a string, character by character,
+and then interpret each character as a number.
 
 #(DS,to_dec,(
   #(DS,[octal],<octal>)
@@ -160,8 +214,8 @@ character, and then interpret each character as a number.
 Random
 ------
 
-Now we can define a random number generator.  Remember to define the seed
-value to an octal number before you call random the first time.
+Now we can define a random number generator.  Remember to define the seed value
+to an octal number before you call random the first time.
 
 #(DS,random,(
   #(DS,seed,
@@ -205,6 +259,37 @@ This should be much faster than calling the usual power script.
 
 #(DS,power2,(#(to_dec,#(BS,1,n))))
 #(SS,power2,n)'
+
+
+Power of Ten
+------------
+
+A power of ten is just a one with a bunch of zeros after it.
+
+#(DS,power10,(1#(times,n,0)))
+#(SS,power10,n)'
+
+
+Divide Into Decimal
+-------------------
+
+This gives you a decimal expansion of a division.  By using the Euclidean
+division defined above, it works with both negative and positive numbers.
+
+#(DS,decimal-places,10)'
+#(DS,DVD,(
+  #(DV+,<a>,<b>,Z).#([DVD],#(ML,10,#(mod,#(abs,<a>),#(abs,<b>))),#(abs,<b>))
+))
+#(sss,DVD,(<a>,<b>,Z))'
+
+#(DS,[DVD],(
+  #(GR,<p>,#(decimal-places),,(
+    #(DV,<a>,<b>)
+    #([DVD],#(ML,10,#(mod,<a>,<b>)),<b>,#(AD,<p>,1))
+  ))
+))
+#(sss,[DVD],(<a>,<b>,<p>))'
+
 
 #(PS,(success!
 ))'

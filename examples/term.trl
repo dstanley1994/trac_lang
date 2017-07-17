@@ -1,5 +1,6 @@
 
 ANSI Escape Codes
+-----------------
 
 #(PS,Loading examples/term.trl...)'
 
@@ -68,8 +69,8 @@ Discard first empty segment:  #(CS,color-list)'
 #(DD,define-effect,define-color)'
 
 
-Now we define our script that will translate the names above into
-actual escape codes.  
+Now we define our script that will translate the names above into actual escape
+codes.  
 
 #(DS,color,(
   #(DS,list,<list>)
@@ -94,7 +95,8 @@ Usage:
   
   Defaults to reset:  #(color)
   
-  The escape codes need to be embedded in print commands to take effect, like so:
+  The escape codes need to be embedded in print commands to take effect, like
+  so:
   
   #(PS,#(color,green-fg)I am green!#(color) I am not!)
 
@@ -117,6 +119,7 @@ Usage:
   when defining the form to protect the newlines in it.
 
 )
+
 
 #(PS,(success!
 ))'

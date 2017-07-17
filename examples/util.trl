@@ -5,11 +5,11 @@ Basic Utilities
 
 Scrub Whitespace
 ----------------
-A problem with TRAC definitions is they're strings, and so if you add whitespace 
-to make them readable, your definition ends up with a lot of extraneous whitespace.
-Carriage return and line feed are normally ignored if they aren't protected, so they
-don't need to be removed, but spaces and tabs aren't.  So here are some scripts to 
-help out:
+A problem with TRAC definitions is they're strings, and so if you add
+whitespace to make them readable, your definition ends up with a lot of 
+extraneous whitespace.  Carriage return and line feed are normally ignored if
+they aren't protected, so they don't need to be removed, but spaces and tabs
+aren't.  So here are some scripts to help out:
 
 scrub-char
 	scrubs a single character out of your script
@@ -23,32 +23,34 @@ scrub
 	#(DS,scrub,(#(scrub-char,<f>,(	))#(scrub-char,<f>,( ))))
 	#(SS,scrub,<f>)'
 
-Call these scripts on your definitions before you call SS, otherwise your arguments 
-will get messed up.  To make that easier to do:
+Call these scripts on your definitions before you call SS, otherwise your 
+arguments will get messed up.  To make that easier to do:
 
 sss	scrubs your script and then segments according to the args you pass
 
 	#(DS,sss,(#(scrub,<f>)#(SS,<f>,<args>)))
 	#(SS,sss,<f>,<args>)'
 
-If you use this for a script that has multiple arguments, protect the argument list with
-parentheses, otherwise TRAC will think your arguments are extra arguments for sss, instead
-of for SS.  Remember TRAC is only passing around strings, not data structures.
+If you use this for a script that has multiple arguments, protect the argument
+list with parentheses, otherwise TRAC will think your arguments are extra 
+arguments for sss, instead of for SS.  Remember TRAC is only passing around 
+strings, not data structures.
 
 
 Special Characters
 ------------------
-Another problem with TRAC is that some characters are special, and so can't be used
-normally.  This is especially true of the two editing characters - 
-the "\" and the "@".  They can't be typed in, but since editing is not done when reading
-a file, they can be entered in a file.  So here are definitions for each.
+Another problem with TRAC is that some characters are special, and so can't be
+used normally.  This is especially true of the two editing characters - the "\"
+and the "@".  They can't be typed in, but since editing is not done when 
+reading a file, they can be entered in a file.  So here are definitions for 
+each.
 
-The meta character can be changed, so that a definition of the default meta character
-single quote can be made.  
+The meta character can be changed, so that a definition of the default meta 
+character single quote can be made.  
 
-The hash or number sign can easily be protected by parentheses, so doesn't need a
-definition at all.  However, parentheses themselves can't be defined, either at a prompt
-or through a file.  
+The hash or number sign can easily be protected by parentheses, so doesn't need
+a definition at all.  However, parentheses themselves can't be defined, either 
+at a prompt or through a file.  
 
 #(DS,backslash,\)'
 #(DS,at,@)'
@@ -67,10 +69,62 @@ Some important characters:
 #(DS,backspace,)'
 
 
+Character Classes
+-----------------
+
+Here are some useful character classes.
+
+#(DS,lower,abcdefghijklmnopqrstuvwxyz)'
+#(DS,upper,ABCDEFGHIJKLMNOPQRSTUVWXYZ)'
+#(DS,digit,0123456789)'
+#(DS,whitespace,##(return)##(tab)##(space))'
+
+Here are some scripts for using the character classes.  These were inspired by
+TTM primitives that have the same names.
+
+#(DS,[TCL],(
+  #(EQ,(<c>),--,(Z),(
+    #(CR,class)
+    #(EQ,##(IN,class,(<c>),--),--,(F),(T))
+  ))
+))
+#(sss,[TCL],(class,<c>,T,F,Z))
+#(DS,TCL,(#([TCL],class,##(CC,form,--),(T),(F),(Z))))
+#(SS,TCL,class,form,T,F,Z)'
+
+TCL (Test Class) tests if the character pointed to by the form pointer is in
+the class given.  If returns T if so, F if not, and Z if the form pointer is at
+the end of the form.
+
+#(DS,[CCL],(
+  #([TCL],class,(<c>),(
+    (<c>)#([CCL],class,##(CC,form,--),form)
+  ),(
+    #(,##(CN,form,-1))
+  ))
+))
+#(sss,[CCL],(class,<c>,form))
+#(DS,CCL,(#([CCL],class,##(CC,form,--),form)))
+#(SS,CCL,class,form)'
+
+CCL (Call Class) returns all consecutive characters from the given form,
+starting at the form pointer and going up to but not including the first
+character that is not in the given class.  In other words, it will return a
+string of characters that are in the class given.  If there are no characters
+in the given class at the form pointer, or if the form pointer is at the end of
+the form, nothing is returned.
+
+#(DS,SCL,(#(,#(CCL,class,form))))
+#(SS,SCL,class,form)'
+
+SCL (Scan Class) will move the form pointer past all characters in the form
+that are in the given character class.
+
+
 Times
 -----
-Execute something a number of times.  The action can be a
-simple string or something more complicated.
+Execute something a number of times.  The action can be a simple string or 
+something more complicated.
 
 #(DS,times,(
   #(EQ,<n>,0,,(
@@ -82,14 +136,14 @@ simple string or something more complicated.
 
 Character Count
 ---------------
-Count the number of characters in a form.  This is probably the most
-involved thing that I wish was a primitive in TRAC.  There isn't a
-code golf challenge that doesn't require this, and if it was a primitive
-TRAC might actually have a chance.
+Count the number of characters in a form.  This is probably the most involved
+thing that I wish was a primitive in TRAC.  There isn't a code golf challenge 
+that doesn't require this, and if it was a primitive TRAC might actually have a
+chance.
 
-This really counts from the form pointer to the end, and sets the form
-pointer at the end of the string as a side effect.  So if you want the
-real length, you have to call CR beforehand.
+This really counts from the form pointer to the end, and sets the form pointer
+at the end of the string as a side effect.  So if you want the real length, you
+have to call CR beforehand.
 
 #(DS,count,(
   #(EQ,##(CC,<f>,--),--,<tot>,(
@@ -117,22 +171,24 @@ List Forms With Prefix
 ----------------------
 
 One way to organize the list of defined forms is to prefix the name of related
-forms with a certain value.  For instance, all the color code definitions in the
-term.trl file are prefixed with "clr-".  This script allows you to list the only
-those forms.  I use "-END-" as a delimiter, so if you use that as a form name
-or part of a form name, this is not going to work right.
+forms with a certain value.  For instance, all the color code definitions in
+the term.trl file are prefixed with "clr-".  This script allows you to list the
+only those forms.  I use "--" as a delimiter, so if you use that as a form
+name or part of a form name, this is not going to work right.
+
+The inner script [next] can't be scrubbed, because you might choose a
+whitespace delimiter.  So instead it has to be defined as a single line.
 
 #(DS,list-prefix,(
-  #(DS,names,#(LN,-END-))
-  #(SS,names,-END-)
-  #(DS,[list],(
-    #(EQ,#(IN,names,<prefix>,-END-),-END-,,(
-      #(CS,names)(<delimiter>)#([list])
-    ))
-  ))
-  #([list])#(DD,names,[list])
+  #(DS,[names],#(LN,--))
+  #(SS,[names],--)
+  #(DS,[delimiter])
+  #(DS,[next],(#(EQ,<name>,--,,(#(DS,[name],<name>)#(EQ,#(IN,[name],prefix,--),,(##([delimiter])#([name])#(DS,[delimiter],(<delimiter>))))#([next],#(CS,[names],--))))))
+  #(SS,[next],<name>)
+  #([next],#(CS,[names],--))#(DD,[next],[names],[name],[delimiter])
 ))
-#(sss,list-prefix,(<prefix>,<delimiter>))'
+#(sss,list-prefix,(prefix,<delimiter>))'
+
 
 #(PS,(success!
 ))'

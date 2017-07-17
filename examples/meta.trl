@@ -5,10 +5,9 @@ Meta Programming
 
 Anonymous functions
 -------------------
-This uses an internal index to create an "anonymous" form and 
-return its name.  Since it returns the name of the "anonymous" 
-function, we can use the function as an object to pass to other
-scripts.
+This uses an internal index to create an "anonymous" form and return its name.
+Since it returns the name of the "anonymous" function, we can use the function
+as an object to pass to other scripts.
 
 #(DS,DAS,(
   #(DS,fseq,#(AD,1,#(fseq)))
@@ -18,16 +17,15 @@ scripts.
 ))
 #(sss,DAS,(<args>,<value>))'
 
-Since a non-existent form returns the empty string,
-and the empty string is the same as zero, we don't
-need to initialize fseq.
+Since a non-existent form returns the empty string, and the empty string is the
+same as zero, we don't need to initialize fseq.
 
 
 Curry
 -----
 
-Currying is to take a script that takes multiple arguments, fill in some
-of its arguments and return a script that will take the rest of the necessary
+Currying is to take a script that takes multiple arguments, fill in some of its
+arguments and return a script that will take the rest of the necessary 
 arguments and can be called at a later time.
 
 #(DS,curry,(#(DAS,(<y>),##(CL,<f>,<x>,<y>))))
@@ -53,25 +51,24 @@ Combinators
 -----------
 
 TRAC can't support real combinators, since it doesn't have truly anonymous 
-functions.  But with a little creativity, you can create something that 
-looks an awful lot like the Y combinator, and does the same kind of work.
+functions.  But with a little creativity, you can create something that looks
+an awful lot like the Y combinator, and does the same kind of work.
 
 Of course these combinators aren't necessary for TRAC.  TRAC already supports
-recursion, so there's no need to create a script that can make scripts recursive.
-However, this does show the power of TRAC and it also helps clear up some of 
-the mystique of these combinators.
+recursion, so there's no need to create a script that can make scripts 
+recursive.  However, this does show the power of TRAC and it also helps clear
+up some of the mystique of these combinators.
 
 U Combinator
 ------------
-The U combinator takes as an argument the name of a script whose only argument 
+The U combinator takes as an argument the name of a script whose only argument
 is a script name.
 
 #(DS,U,(#(<f>,<f>)))
 #(SS,U,<f>)'
 
-Using the U combinator we can create a recursive function
-from a special sort of function.  Here's an example for
-calculating the factorial.
+Using the U combinator we can create a recursive function from a special sort
+of function.  Here's an example for calculating the factorial.
 
 (
 #(DS,fact,(
@@ -89,10 +86,10 @@ calculating the factorial.
 How does the U combinator work?  If you turn trace on and trace through the
 operation of ! you get a good idea of what's happening.  The "fact" script
 creates an anonymous function which does the work of testing the end condition
-and setting up the multiplication necessary. The U combinator passes a 
-script to itself, allowing it to call itself without direct recursion.  The 
-doubling in the U combinator is what makes the recursion work.  It passes a
-copy of the script to be called to itself.  
+and setting up the multiplication necessary. The U combinator passes a script
+to itself, allowing it to call itself without direct recursion.  The doubling
+in the U combinator is what makes the recursion work.  It passes a copy of the
+script to be called to itself.  
 
 The U combinator must be called inside the script that's being made recursive,
 which isn't as neat as we would like.  If we factor the U combinator out of 
@@ -102,14 +99,14 @@ our script, we get the famous Y combinator.
 Y Combinator
 ------------
 
-This version of the Y combinator uses the U combinator in its definition.  
-Pass in a script that takes a single argument and returns the name of a script.  
+This version of the Y combinator uses the U combinator in its definition.  Pass
+in a script that takes a single argument and returns the name of a script.  
 Looking at it this way and comparing it to the factorial definition above helps
-make it understandable.  The outer U corresponds to the U in the definition
-of !, while the inner U corresponds to the U in the definition of fact.  The 
+make it understandable.  The outer U corresponds to the U in the definition of 
+!, while the inner U corresponds to the U in the definition of fact.  The
 definition of an anonymous function is necessary because that's the only real
-way TRAC has of passing a function around as an object.  As a result this creates
-a lot of identical anonymous functions.
+way TRAC has of passing a function around as an object.  As a result this
+creates a lot of identical anonymous functions.
 
 #(DS,Y,(
   #(U,(
@@ -123,9 +120,10 @@ a lot of identical anonymous functions.
 
 Y Combinator w/o U
 ------------------
-Here's the closest TRAC is going to get to having a real Y combinator.  We take the 
-version of Y above and expand the definition of the U combinator.  If you've seen
-the Y combinator in other forms, you will see the resemblance here.  
+
+Here's the closest TRAC is going to get to having a real Y combinator.  We take
+the version of Y above and expand the definition of the U combinator.  If 
+you've seen the Y combinator in other forms, you will see the resemblance here.  
 
 #(DS,Y,(
   #(DAS,<x>,(
@@ -136,14 +134,15 @@ the Y combinator in other forms, you will see the resemblance here.
 ))
 #(sss,Y,<f>)'
 
-What's interesting is how the Y combinator is thought of as an airy abstraction in computing,
-but here it's being defined in a language which is nothing but strings, which is about as
-concrete as you can get.
+What's interesting is how the Y combinator is thought of as an airy abstraction
+in computing, but here it's being defined in a language which is nothing but
+strings, which is about as concrete as you can get.
 
-Here's how you would create the factorial function using the Y combinator.  We create a
-script that takes an anonymous function as an argument and returns a new anonymous function.  
-The anonymous function returned takes a single integer argument and returns one if the input 
-was zero, otherwise multiplies the input by the output of the script passed in.
+Here's how you would create the factorial function using the Y combinator.  We
+create a script that takes an anonymous function as an argument and returns a
+new anonymous function.  The anonymous function returned takes a single integer
+argument and returns one if the input was zero, otherwise multiplies the input
+by the output of the script passed in.
 
 (
 #(DS,fact,(
@@ -159,6 +158,7 @@ was zero, otherwise multiplies the input by the output of the script passed in.
 )
 
 Here's how you would count characters in a form using the Y combinator.
+
 (
 #(DS,count,(
   #(DAS,<s>,(

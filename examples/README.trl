@@ -1,0 +1,609 @@
+
+TRAC Example Code README
+
+#(PS,Loading examples/README.trl...)'
+
+
+Introduction
+-------------------------------------------------------------------------------
+
+  TRAC is a macro language, meaning it consists solely of replacing strings of 
+  text with other strings of text.  Despite this seeming simplicity, it's 
+  capable of very sophisticated programming constructs.  TRAC was originally 
+  created in the sixties by Calvin Mooers and implemented by Peter Deutsch.  
+  The best introduction to TRAC is to read Mooers original user manual, which 
+  you can find online on the following page:
+  
+    TRAC T64 Version
+    https://web.archive.org/web/20050205173449/http://tracfoundation.org:80/t64tech.htm
+    
+  TRAC was featured in Computer Lib/Dream Machines by Ted Nelson.
+
+  There's a version of TRAC called MINT which was used to write a version of 
+  EMACS called FreeMACS.  You can find a version of it here:
+  
+    C++ Windows/Linux/MacOS X port of Russell Nelson's FreeMACS. 
+    https://github.com/msandiford/Freemacs
+
+  Another macro language that's similar to TRAC is TTM.  In the following PDF 
+  file, a number of applications for a macro language are demonstrated, 
+  including expression parsing.  It's a great introduction to what TRAC can do.
+  
+    TTM: An Experimental Interpretive Language
+    https://github.com/Unidata/ttm/raw/master/ttm_interpretive_language_pr_07.pdf
+
+
+Using TRAC
+-------------------------------------------------------------------------------
+
+  Each TRAC command starts with one or two hash characters, and are surrounded
+  by parentheses, like so:
+  
+  (
+    #(PS,Hello World!)
+    #(DS,test,##(RS))
+  )
+  
+  The first word after the open parenthesis is the command, while the other 
+  words after are the arguments.  The commands above will print "Hello World!" 
+  and then set the variable "test" to whatever you type in.  A complete list of
+  TRAC commands appears later in this file.
+  
+  You can either enter TRAC commands in a file and have the file executed, or 
+  type them in at the command prompt while in the TRAC interpreter.  Either 
+  way, to let the parser know that you're ready for it to execute the command, 
+  you must end the command with a single quote, known as the meta character.  
+  You can see an example of this at the beginning of this file and at the end.
+  The meta character should not appear within comments such as this, nor within
+  protecting parentheses.
+
+  TRAC was originally written for a teletype - a computer attached to a 
+  typewriter.  Whatever you typed would be printed on a piece of paper, not a
+  screen, so there was no such thing as backspacing over your mistakes.  So
+  working at the prompt is going to be different from what you're used to. The
+  "\" character will tell TRAC to ignore the last character you typed and the
+  "@" character will tell TRAC to ignore everything you've typed.  So if you
+  type the following:
+  (
+  	#,\(,@#(O\Ps\S,Hello)
+  )
+  the TRAC interpreter will see this:
+  (
+  	#(PS,Hello)
+  )
+  Also, the enter key will not make a command be executed.  Instead the meta
+  character will, as explained above.  So the following is valid TRAC, and
+  will print two new lines:
+  (
+  	#(PS,(
+  	
+  	))
+  )
+  
+  As you can see from this file, text can be mixed freely in TRAC code files,
+  and will be ignored.  If you want some code to be ignored, just protect it 
+  with parentheses, like so:
+  (
+    #(PS,This will not be printed)
+  )
+
+  TRAC does not do a lot of error checking.  If you give it a command it 
+  doesn't recognize, it will ignore it.  You can take advantage of this by 
+  using the empty command to create comments in scripts:
+  
+  #(, This will also not be executed)'
+  
+  Although the command above is executed, since it doesn't exist as a valid 
+  command it will be replaced by the empty string when it's processed.
+  
+  There are three syntactic groupings in TRAC:
+  
+  *   Active Command
+      .  Starts with single hash character, delimited by matching parentheses
+      .  Result is result of TRAC or user defined command
+      .  Result is rescanned for more commands
+  *   Neutral Command
+      .  Starts with two hash characters, delimited by matching parentheses
+      .  Result is result of TRAC command
+      .  Result is not scanned again
+  *   Protected Parentheses
+      .  Delimited by matching parentheses
+      .  Result is text between parentheses
+      .  Result is not scanned again
+  
+  There's one last concept about TRAC that needs to be reviewed.  When the TRAC
+  command DS gives a name to a string, that defined string is called a form.
+  Each form has a form pointer, that points to a character in the string.  
+  Different commands will return what the form pointer is pointing to and then
+  increment the form pointer.  What is returned and how the form pointer is
+  incremented depends on which command is called.  
+
+Coding Conventions
+-------------------------------------------------------------------------------
+
+  Carriage returns and line feeds are ignored in TRAC commands unless they're 
+  protected by parentheses, so commands can have any number of newlines to make
+  them more readable.  However, spaces and tabs are not ignored, and commands
+  are harder to understand if there's no indentation.  So, I've written a 
+  "scrub" script that removes spaces and tabs from forms as well, in the 
+  examples/util.trl file.  
+  
+  In the example code, I've used two spaces for indentation, and started a new
+  line for the following:
+  
+  *   definitions
+  *   sequential commands
+  *   results of tests
+  
+  You can see all of this in the following defintions, which create a script to
+  reverse a string.
+  
+  (
+  
+  #(DS,[reverse],(                       #(,   <== define helper script  )
+    #(EQ,##(CC,<a>,--),--,(              #(,   <== at end of string?   )
+      ##(CL,str)                         #(,   <== if so, return answer  )
+    ),(                                  #(,   <== otherwise  )
+      #(,##(CN,<a>,-1))                  #(,   <== read prev char, discard  )
+      #(DS,str,##(CC,<a>)##(CL,str))     #(,   <== add last char read )
+      #([reverse],<a>)                   #(,   <== call recursively  )
+    ))
+  ))
+  #(sss,[reverse],<a>)
+
+  #(DS,reverse,(#(DS,str,)#([reverse],<a>)))
+  #(SS,reverse,<a>)'
+
+  )
+  
+  In most of my definitions, I've delimited arguments to forms with angle 
+  brackets.  This is not a requirement - TRAC allows you to enter any string 
+  whatsoever.  I used the angle brackets because they stand out and they also
+  make the parameter names unique.  Look at the following example.
+  
+  (
+    #(DS,diff,(#(abs,#(SU,a,b))))
+    #(SS,diff,a,b)
+  )
+  
+  Because there aren't angle brackets around a and b, the a and b of abs have
+  also been made into segment gaps, and we have:
+  
+  (
+    #(diff,2,3)  => #(23s,#(SU,2,3))
+  )
+  
+  TRAC, being error averse, simply returns the empty string from the 
+  non-existent form 23s.
+  
+  Although TRAC allows you to use any character for anything, I've avoided 
+  using symbols for operations I've defined.  Letters are much easier to type 
+  than symbols, so for instance, I have:
+  
+  	mod	for modulo		instead of %
+  	abs	for absolute value	instead of |.|
+  	times	for repeated action	instead of *
+  
+  However, if you prefer symbols instead of names, it would be easy enough for
+  you to make a file of synonyms for operations if you want.
+
+
+TRAC Commands
+-------------------------------------------------------------------------------
+
+  Each command takes some action and then returns a string as a result.  
+  
+  Basic Commands
+  --------------
+
+  DS Define String  (  #(DS,name,value)  )
+     Result:  Empty string
+  
+     Defines a string, giving it a name and storing it in form storage.
+     Strings that have been given names are called "forms".  Strings that have
+     TRAC commands in them are called "scripts".  
+     
+     When you define a script, remember to protect its definition with 
+     parentheses or you will end up running the script before it's named.
+     (
+     	#(DS,value,#(AD,a,5))
+     	#(DS,value2,(#(AD,a,5)))
+     )
+     Above "value" has been set to 5, since strings without numeric characters
+     in them are considered equal to zero.  The "value2" on the other hand, has
+     been set to( #(AD,a,5) )so later, if we put in a value for "a", it will be
+     able to calculate something.
+     
+  SS Segment String  (  #(SS,name,arg1,arg2,...)  )  Result: empty string
+     Result:  Empty string
+  
+     Break a defined string into segments, using the given arguments.  Each 
+     argument is searched for in turn, and if found in the named string, a
+     numbered hole is punched in the string where the argument was found.  The
+     parts of the string between the holes are called segments, and the holes
+     themselves are called segment gaps.  Using the defintions from above:
+     (
+        #(DS,value2,(#(AD,a,5)))
+     	#(SS,value2,a)
+     )
+     Now the form value2 has a hole where the "a" was, which can be filled with
+     whatever we want when we call it using the next command.
+     
+  CL Call  (  #(CL,name,arg1,arg2,...)  )
+     Result:  Value of form with gaps replaced by given arguments
+  
+     Retrieve a form, replacing any segments gaps in it with the arguments 
+     provided.  Taking the commands from above as before:
+     (
+        #(DS,value2,(#(AD,a,5)))
+     	#(SS,value2,a)
+     	#(CL,value2,5)		==> result 10
+     	#(CL,value2,121)	==> result 126
+     	#(CL,value2,#(ML,2,7))	==> result 70	
+     	#(CL,value2)		==> result 5 (gap replaced by empty string
+     					      which has a value of zero)
+     )
+     Also, we can call this command neutrally to see what the value of a form
+     is.  
+     (
+     	##(CL,value2,--arg1--)	==> result( #(AD,--arg1--,5) )
+     )
+     
+  HL Halt  (  #(HL)  )
+     Result:  Empty string
+     
+     Stop the TRAC processor.  
+     
+
+  Console I/O
+  -----------
+
+  PS Print String  (  #(PS,value)  )
+     Result:  Empty string
+     
+     Prints the given value to the console.  Unless the value is protected by
+     parentheses, any carriage return or linefeed character in it will be 
+     stripped.  All other control characters can appear in the value however,
+     including ANSI escape codes for controlling the terminal.
+     
+  RC Read Character  (  #(RC)  )
+     Result:  Character read
+     
+     Read a single character from the keyboard.  Any character can be entered
+     this way, include parentheses, the meta character and the two editing
+     characters.
+
+  RS Read String  ( #(RS)  )
+     Result:  Value read
+     
+     Read a string from the keyboard, up until the meta character is pressed.
+     The string may have any character you can type at the keyboard, with the
+     following exceptions:
+     
+     Edit character \	erases previous character from string
+     Edit character @	erases entire entered string
+     Meta character	ends input
+     
+     The meta character is normally set to single quote but you can change it
+     to another character using the following command.
+     
+  CM Change Meta  (  #(CM)  )
+     Result:  Empty string
+     
+     Change the meta character to a different character.  Once it's changed all
+     input will use the new meta character until you call this command with a
+     different value.  You can even change the meta character to the enter key
+     if you wish.
+
+  Form Reading
+  ------------
+  
+  CC Call Character  (  #(CC,name,eos)  )
+     Result:  Next character of form or eos value if at end of string
+  
+     Returns the next character of the form and increments the form pointer by
+     one.  If the form pointer is at the end of the string, the eos value is
+     returned.  This is used to read a form character by character.
+     
+  CN Call N Characters  (  #(CN,name,n,eos)  )
+     Result:  Next n characters of form or eos value if at end of string
+     
+     Returns "n" characters from the string and increments the form pointer by
+     the same amount.  The "n" can be positive or negative.  When "n" is 
+     negative the characters read are still returned in the orginal order they
+     are in the string.  If "n" is positive and the form pointer is at the end
+     of the string, or "n" is negative and the form pointer is at the beginning
+     of the string, the eos parameter is returned.  
+     
+     This can be called to check if the form pointer is at the beginning or end
+     of the string without moving the pointer by using -0 or 0 as the number of
+     characters respectively.  For example:
+     (
+       #(CN,string,-0,begin) <= returns "begin" if you're at the beginning of
+                                the form, and an empty string otherwise
+       #(CN,string,0,end)    <= returns "end" if you're at the end of the form
+                                and an empty string otherwise
+     )
+  
+  CS Call Segment  (  #(CS,name,eos)  )
+     Result:  Next segment of form or eos value if at end of string
+     
+     When you punch holes in a form with the SS command, text between the holes
+     is called a segment.  This command calls up each segment in turn, and then
+     returns the eos argument when the form pointer is at the end of the form.
+     For example:
+     (
+       #(DS,list,2;5;13;7;12)
+       #(SS,list,;)		<= each number is now in an individual segment
+       #(CS,list)		<= "2"
+       #(CS,list)		<= "5"
+       #(CL,list,/)		<= "13/7/12"
+     )
+     A gotcha to watch out for - if a segment gap starts the form, an empty
+     string will be returned for the first call.  For example:
+     (
+       #(DS,name,<first> <middle-init>. <last>)
+       #(SS,name,<first>,<middle-init>,<last>)
+       #(CS,name)		<= empty string
+       #(CS,name)		<= single space
+       #(CS,name)		<= ". "
+       #(CL,name,Smith)		<= last segment gap is numbered three and
+       				   no third argument was given, so empty
+       				   string is returned
+     )
+  
+  IN In String  (  #(IN,name,value,eos)  )
+     Result:  String preceeding found value or eos value if at end of string
+
+     The IN command searches for a string in the given form starting at the
+     form pointer.  If the value is found, this command returns everything 
+     between the form pointer and the found string, and then the form pointer
+     is moved beyond the found string.  If the value is not found, the eos
+     value is returned and the form pointer is unchanged.
+     
+     This command can also be used to test if a form with a given name exists.
+     Let value be the empty string, something that will never be found in an
+     existing form.  
+     (
+       #(IN,x123,,no)
+       If a form with the name x123 exists, "no" will be returned.  Otherwise
+       the empty string will be returned since the form doesn't exist.
+     )
+     
+  CR Call Return  (  #(CR,name)  )
+     Result:  Empty string
+     
+     This command moves the form pointer back to the start of the form.  There
+     is no corresponding command that moves the pointer to the end of the form.
+
+
+  Form Storage
+  ------------
+
+  LN List Names  (  #(LN,delimiter)  )
+     Result:  List of form names delimited by given delimiter
+     
+     This command lists the names of all defined forms using the given 
+     delimiter.  Two examples, using space and newline as delimiters:
+     (
+       #(LN, )scrub count times backslash space return tab escape ...
+       #(LN,(
+       ))
+       scrub
+       count
+       times
+       ...
+     )
+  
+  DD Delete Definition  (  #(DD,name1,name2,...)  )
+     Result:  Empty string
+  
+     Deletes the named definitions.  If one of the names doesn't correspond to
+     an existing definition, it's ignored.
+     
+  DA Delete All  (  #(DA)  )
+     Result:  Empty string
+  
+     Delete all defined forms.
+     
+  SB Store Block  (  #(SB,block-name,form-name1,form-name2,...)  )
+     Result:  Empty string
+  
+     Saves the given forms in a file with the given name and an extension of
+     .trl in the default save directory.  The listed forms will be removed from
+     the list of definitions, and a new form will be created, with the same
+     name as the block name.  This form will be used in the following command.
+     
+  FB Fetch Block  (  #(FB,block-name)  )
+     Result:  Empty string
+     
+     Reads the file defined by the given form and loads all TRAC commands in
+     that file.  The file can either have been created by the SB command above
+     or created by hand using an editor.  
+     
+
+  Integer Mathematics
+  -------------------
+
+  Numbers in TRAC are just strings; they are just read in a special way.  Any
+  leading non-numeric characters are ignored, so numbers can have descriptive
+  prefixes, like "apples5" or "salary-john:150000".  Numbers have an optional
+  sign, and then a string of digits.  A string without any digits in it is
+  intepreted as a zero.
+  
+  AD Add  (  #(AD,n1,n2)  )
+     Result:  Sum of n1 and n2
+  
+     Add two numbers.  The prefix for n1 will be copied to the result.
+     
+  SU Subtract  (  #(SU,n1,n2)  )
+     Result:  Difference of n1 and n2
+     
+     Subtract two numbers.  The prefix for n1 will be copied to the result.
+  
+  ML Multiply  (  #(ML,n1,n2)  )
+     Result:  Product of n1 and n2
+  
+     Multiply two numbers.  The prefix for n1 will be copied to the result.
+     
+  DV Divide  (  #(DV,n1,n2,z)  )
+     Result:  Quotient of n1 and n2, or z if n2 is zero
+
+     Divide n2 into n1.  TRAC truncates down, so for instance, -7 / 3 is -3.
+     If n2 is zero, the z parameter is returned.
+     
+     
+  Octal Mathematics
+  -----------------
+
+  Bit operations are done on octal numbers in TRAC.  Unlike integers, octal
+  numbers do not carry a non-numeric prefix.  TRAC also does not have a word
+  size defined, so octal numbers can be of arbitrary length.  This means the
+  shift and rotate commands will work with the bits you have given them, 
+  instead of working within a fixed word size.
+  
+  BU Bit Union  (  #(BU,o1,o2)  )
+     Result: Bitwise OR of two octal numbers.
+     
+  BI Bit Intersection  (  #(BI,o1,o2)  )
+     Result:  Bitwise AND of two octal numbers.
+     
+  BC Bit Complement  (  #(BC,o1)  )
+     Result:  Bitwise complement of octal number.
+     
+  BS Bit Shift  (  #(BS,o1,n1)  )
+     Result:  Bit shift of octal number by the decimal number given.
+     
+  BR Bit Rotate  (  #(BR,o1,n1)  )
+     Result:  Bit rotation of octal number by the decimal number given.
+
+
+  Debugging
+  ---------
+
+  PF Print Form  (  #(PF,name)  )
+     Result:  Empty string
+     
+     Print the value of a form, with indicators to show where the form pointer
+     is and where the segment gaps are.  For example:
+     (
+       #(DS,form,abcdefghijklmnop)
+       #(SS,form,c,f,j)
+       #(CS,form)  ==> ab
+       #(CS,form)  ==> de
+       #(CC,form)  ==> g
+       #(PF,form)  ==> ab<1>de<2>g<^>hi<3>klmnop
+     )
+     
+  TN Trace On  (  #(TN)  )
+     Result:  Empty string
+
+     Turns trace on.  When trace is on, every time TRAC is ready to execute a
+     string, it will display it first, and wait for your response.  The string
+     will be displayed in a special form, delimited by slashes instead of 
+     parentheses and with asterisks separating arguments instead of commas.  If
+     you want to execute the command, press enter, and the next command will be
+     displayed to you.  If you want to quit, press any other key and the TRAC
+     processor will be cleared and the idle string will be reloaded.  The idle
+     string is the following TRAC command:
+     (
+       #(PS,#(RS))
+     )
+     This reads a string, executes it, and prints the result.  This is loaded
+     on startup, whenever a serious error occurs, and when you exit from trace.
+     
+  TF Trace Off  (  #(TF)  )
+     Result:  Empty string
+
+     Turn tracing off.  You can debug certain sections of code by surrounding
+     it with a trace on and trace off command.  
+     
+
+Example Files
+-------------------------------------------------------------------------------
+
+  README.trl	This file
+  util.trl	Basic utilities for TRAC, including scrub which is needed for
+                the rest of the files
+  term.trl	Terminal control with ANSI escape codes
+  math.trl	Definition of some basic mathematical functions
+  meta.trl	Meta-programming including combinators
+  golf.trl	A few code golf attempts
+  
+
+Things To Watch Out For
+-------------------------------------------------------------------------------
+
+  Active Call .vs. Neutral Call
+
+  The result of an active call is rescanned for TRAC commands while the result
+  of a neutral call is not.  But you need to remember, you can only call a TRAC
+  mnemonic command neutrally.  User defined commands are always active.  So in
+  the following:
+  
+  (
+    ##(mycmd,1,2,3)
+    ##(CL,mycmd,1,2,3)
+  )
+  
+  only the second call is a neutral call.  The result of the first one is 
+  rescanned, despite the double hash marks in front of it.
+  
+
+  Unprotected Whitespace
+   
+  Newlines and linefeeds are ignored if they are unprotected.  This is great
+  for the average script, but when you're trying to create a form with newlines
+  in it, it can be frustrating.  Just remember to protect any newlines you want
+  to keep with parentheses.  Also, if you use any of my scrub scripts defined
+  in examples/util.trl, remember to use (##(CL,space)) instead of a literal 
+  space when you actually want to use a space character.
+
+
+  CL And The Form Pointer
+  
+  The CL command only returns the part of the form that is past the form
+  pointer.  So if you ever use one of the form call commands (CC,CN,CS,IN) on a
+  script, CL is not going to return what you expect.
+  (
+    #(DS,diff,(#(GR,a,b,(#(SU,a,b)),(#(SU,b,a)))))
+    #(SS,diff,a,b)
+    
+    Find out if script uses "GR"
+    
+    #(EQ,#(IN,diff,GR,-END-),-END-,not-used,used)
+    
+    If we call it now, we get:
+    
+    #(diff,5,2) ==> ,5,2,(#(SU,5,2)),(#(SU,2,5)) (plus another paren)
+    
+    which is more than likely going to cause an error.
+  )
+  
+  EQ .vs. GR
+
+  EQ is for comparing strings, while GR is for comparing numbers.  This can
+  lead to some confusing results:
+   
+  (
+    #(EQ,0,,true,false)  => false
+      
+      Even though the empty string is zero numerically, here it's being
+      compared as a string, and so it not equal to 0.  To find if two numbers
+      are equal, you must verify that neither is greater than the other.  In
+      the examples/math.trl file I define a script called eqn which tests 
+      numeric equality this way.  This will usually not cause problems if you
+      don't use prefixes on numbers, but the above can catch you if you're not
+      careful.
+        
+    #(GR,b,a,true,false) => false 
+      
+      Both "a" and "b" are considered zero numerically, so neither is greater 
+      than the other, so this will return false no matter which character is 
+      first.  TRAC actually doesn't have any provision for comparing strings 
+      lexically.
+  )
+
+
+#(PS,(success!
+))'
