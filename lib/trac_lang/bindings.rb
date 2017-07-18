@@ -44,6 +44,7 @@ module TracLang
       @bindings.delete(name)
     end
     
+    # Passes each binding to the given block.
     def each(&blk)
       @bindings.each(&blk)
     end

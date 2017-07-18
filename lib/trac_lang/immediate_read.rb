@@ -11,6 +11,7 @@ module TracLang
   # between operating systems.
   class ImmediateRead
   
+    # Creates class with console input handler depending on operating system.
     def initialize
       if (/mingw|win|emx/=~RUBY_PLATFORM)!=nil
         @getchar=lambda{WinAPI._getch} # Windows
@@ -19,17 +20,19 @@ module TracLang
       end
       @method_name = :highline
     end
-    
+  
+    # Get character from console input.
     def getch
       self.send(@method_name)
     end
-    
+  
     def console_io
       c = IO.console.getch
       print c
       c
     end
-    
+
+    # Get character from console input, doing any translation necessary.    
     def highline
       chr = @getchar[].chr
       case chr

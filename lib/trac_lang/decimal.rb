@@ -50,7 +50,15 @@ class Decimal
   end
 
   # Defines method for given arithmetical operation.  Result has string
-  # prefix of self.  
+  # prefix of self.  The operations defined are:
+  # [+]
+  #    Sum of two decimals.
+  # [-]
+  #    Difference.
+  # [*]
+  #    Product.
+  # [/]
+  #    Quotient.
   def self.define_operation(symbol)
     define_method(symbol) do |other| 
       result = Decimal.new

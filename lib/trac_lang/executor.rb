@@ -37,7 +37,8 @@ module TracLang
       end
     end
     
-    # Executes a line of TRAC loaded from a file.
+    # Executes a line of TRAC loaded from a file.  If an error occurs, an error
+    # message will be printed with the line number and filename.
     def load(filename, lineno, line)
       @code ||= ''
       to_exe = ''
@@ -58,7 +59,8 @@ module TracLang
       return false
     end
     
-    # Executes a string of TRAC.
+    # Executes a string of TRAC.  If we are in trace mode, wait for user input
+    # after executing string.
     def execute(str)
       @parser.parse(str) do |to_call|
         if @dispatch.trace
