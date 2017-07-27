@@ -1,0 +1,4 @@
+#!/usr/bin/env ruby
+require 'trac_lang/cli'
+TracLang::CLI.start
+
