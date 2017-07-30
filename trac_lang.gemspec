@@ -23,13 +23,11 @@ Gem::Specification.new do |spec|
       "public gem pushes."
   end
 
-  spec.files         = `git ls-files -z`.split("\x0").reject do |f|
-    f.match(%r{^(test|spec|features)/})
-  end
+  spec.executables   = ['trac_lang']
+  spec.files         = ['exe/trac_lang']
   spec.has_rdoc = true
   spec.rdoc_options << '--include' << 'lib/trac_lang'
   spec.bindir        = "exe"
-  spec.executables   = spec.files.grep(%r{^exe/}) { |f| File.basename(f) }
   spec.require_paths = ["lib"]
 
   spec.add_runtime_dependency "highline", "~> 1.7", ">= 1.7.8"
@@ -37,6 +35,6 @@ Gem::Specification.new do |spec|
   spec.add_development_dependency "bundler", "~> 1.14"
   spec.add_development_dependency "rake", "~> 10.0"
   spec.add_development_dependency "rspec", "~> 3.0"
-  spec.add_development_dependency "cucumber", "~> 2.4.0"
+  spec.add_development_dependency "cucumber", '~> 2.4', '>= 2.4.0'
   spec.add_development_dependency "aruba", "~> 0.14.2"
 end
