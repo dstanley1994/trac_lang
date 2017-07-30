@@ -9,6 +9,7 @@ require_relative 'trac_lang/immediate_read'
 require_relative 'trac_lang/octal'
 require_relative 'trac_lang/parser'
 require_relative 'trac_lang/version'
+require_relative 'trac_lang/cli'
 
 # Module containing code for processing TRAC language.
 module TracLang
