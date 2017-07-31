@@ -10,7 +10,7 @@ module TracLang
     method_option :trace, :aliases => '-t', :desc => 'Turn trace on'
     def command(*files)
       begin 
-        d = TracLang::Dispatch.new(parse_options)
+        d = TracLang::Dispatch.new(options)
         e = TracLang::Executor.new(d)
         catch :done do
           files.each do |file|
@@ -18,7 +18,7 @@ module TracLang
               e.load(file, __LINE__, f.gets)
             end
           end
-          exit if parse_options[:exit_on_eof]
+          exit if options[:exit_on_eof]
           e.prompt
         end
         puts 'Exiting...'
