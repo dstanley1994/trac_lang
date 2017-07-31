@@ -24,7 +24,8 @@ module TracLang
         puts 'Exiting...'
         puts
       rescue => error
-        print_error(error)
+        puts "An unexpected error occured while running TRAC Lang"
+        puts "  #{error}\n"
         exit(false)
       end      
     end
