@@ -3,11 +3,13 @@ Code Golf
 
 #(PS,Loading examples/golf.trl...)'
 
-TRAC is never going to win a Code Golf competition.  It's lack of primitives makes it difficult to do anything under a 
-hundred characters.  However, trying to figure out how to write certain things in TRAC does help you learn the ins and 
-outs of the language.  Below are a few of my attempts at some of the Code Golf challenges.
+TRAC is never going to win a Code Golf competition.  It's lack of primitives
+makes it difficult to do anything under a hundred characters.  However, trying
+to figure out how to write certain things in TRAC does help you learn the ins
+and outs of the language.  Below are a few of my attempts at some of the Code 
+Golf challenges.
 
----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 The Curious Case of Steve Ballmer - 158 characters
 
 #(DS,x,Steve Ballmer still does not know;what he did;wrong;with mobile)#(SS,x,;)#(DS,,(#(PS,(a.
@@ -27,7 +29,7 @@ Ungolfed Version:
 #(print-phrase,#(CS,sentence),#(CS,sentence))
 )
 
----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Am I A Secondary Taxi? - 219 characters
 
 #(DS,3,(#(ML,n,#(ML,n,n))))#(SS,3,n)#(DS,,(#(EQ,#(AD,#(3,i),#(3,j)),n,(#(DS,+,#(AD,1,#(+)))))))#(SS,,n,i,j)#(DS,x,(#(,n,i,j)#(EQ,j,n,(#(GR,#(+),1,T,F)),(#(EQ,i,n,(#(,n,1,#(AD,1,j))),(#(,n,#(AD,1,i),j)))))))#(SS,x,n,i,j)'
@@ -54,7 +56,7 @@ Ungolfed version:
 #(SS,taxi,<n>,<i>,<j>)
 )
 
----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Unique Is Cheap - 99 characters
 
 Assume string to test is contained in form s:
@@ -76,7 +78,7 @@ Assume string to test is contained in form "string":
 #(cost,#(CC,string,**))
 )
 
----------------------------------------------------------------------------------------------------------------------------------------------
+-------------------------------------------------------------------------------
 Fewest (distinct) characters for Turing Completeness - 6 characters
 
 hash, open-paren, close-paren, comma, D and S
@@ -103,26 +105,6 @@ Ungolfed version:
 
 If a equals b, then the definition of b will overwrite the definition of a, 
 
-
-Reverse A Form
---------------
-This returns the reversed value of a form.  This will work on any form whether it has
-parentheses or not.  Because of the possibility of parentheses, an intermediate form
-called "str" is required, so that neutral calls can be made on it.  
-
-#(DS,[reverse],(
-  #(EQ,##(CC,<a>,--),--,
-    (##(CL,str)),
-    (#(,##(CN,<a>,-1))
-     #(DS,str,##(CC,<a>)##(CL,str))
-     #([reverse],<a>))
-  )
-))
-#(scrub,[reverse])
-#(sss,[reverse],<a>)'
-
-#(DS,reverse,(#(DS,str,)#([reverse],<a>)))
-#(SS,reverse,<a>)'
 
 #(PS,(success!
 ))'
