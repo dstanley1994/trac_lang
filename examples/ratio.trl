@@ -1,0 +1,92 @@
+
+Definition of rational numbers
+
+#(PS,Loading examples/ratio.trl...)'
+
+Basics
+-------------------------------------------------------------------------------
+
+The format of our rational numbers will be:
+
+numerator/denominator
+
+To work with them we will need a way of extracting the numerator and
+denominator from them.  As you can see, our lambda function is not only for
+creating anonymous functions; it can also be used to create anonymous data.
+
+#(DS,numr,(#(segment,1,#(lambda,/,x))))
+#(SS,numr,x)'
+
+#(DS,dnmr,(#(segment,2,#(lambda,/,x))))
+#(SS,dnmr,x)'
+
+Often we are going to need to pass a rational into a form as a separate
+numerator and denominator.  So it will be useful to have a function that
+changes a rational into a set of two parameters.  The following will replace
+the slash in a rational with a comma.
+
+#(DS,argr,(#(CL,#(lambda,/,x),(,))))
+#(SS,argr,x)'
+
+Next we need a way of reducing fractions to standard form.  
+
+First we have something to reduce the faction by a given value.
+
+#(DS,reduceby,(#(DV,#(numr,x),by)/#(DV,#(dnmr,x),by)))
+#(SS,reduceby,x,by)'
+
+Next we have a function to normalize the sign of a fraction.  Notice that if
+the denominator is zero, we change the fraction to 0/0, our form for NaN.
+
+#(DS,reducesign,(#(sgn?,denom,numer/denom,0/0,(#(-,numer)/#(-,denom)))))
+#(SS,reducesign,numer,denom)'
+
+We need a GCD that's works the same with negative and positive numbers.
+
+#(DS,gcd+,(#(gcd,#(abs,x),#(abs,y))))
+#(SS,gcd+,x,y)'
+
+Finally we combine all these functions into one that will put all our rationals
+in normal form.
+
+#(DS,reduce,(#(reducesign,#(argr,#(reduceby,x,#(gcd+,#(argr,x)))))))
+#(SS,reduce,x)'
+
+
+Arithmetic
+-------------------------------------------------------------------------------
+
+#(DS,[addr],(#(reduce,#(op,#(ML,<a>,<d>),#(ML,<b>,<c>))/#(ML,<b>,<d>))))
+#(SS,[addr],op,<a>,<b>,<c>,<d>)'
+
+#(DS,addr,(#([addr],AD,#(argr,x),#(argr,y))))
+#(SS,addr,x,y)'
+
+#(DS,subr,(#([addr],SU,#(argr,x),#(argr,y))))
+#(SS,subr,x,y)'
+
+#(DS,mulr,(#(reduce,#(ML,#(numr,x),#(numr,y))/#(ML,#(dnmr,x),#(dnmr,y)))))
+#(SS,mulr,x,y)'
+
+#(DS,divr,(#(reduce,#(ML,#(numr,x),#(dnmr,y))/#(ML,#(numr,y),#(dnmr,x)))))
+#(SS,divr,x,y)'
+
+#(DS,rcpr,(#(dnmr,x)/#(numr,x)))
+#(SS,rcpr,x)'
+
+
+Tests
+-------------------------------------------------------------------------------
+
+#(DS,grr,(#(GR,#(ML,#(numr,x),#(dnmr,y)),#(ML,#(numr,y),#(dnmr,x)),(T),(F))))
+#(SS,grr,x,y,T,F)'
+
+#(DS,eqnr,(#(and,(eqn,#(numr,x),#(numr,y)),(eqn,#(dnmr,x),#(dnmr,y)),(T),(F))))
+#(SS,eqnr,x,y,T,F)'
+
+#(DS,NaN?,(#(eqn,#(dnmr,x),0,(T),(F))))
+#(SS,NaN?,x,T,F)'
+
+
+#(PS,(success!
+))'

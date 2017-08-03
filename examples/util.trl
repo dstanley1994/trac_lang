@@ -190,5 +190,55 @@ whitespace delimiter.  So instead it has to be defined as a single line.
 #(sss,list-prefix,(prefix,<delimiter>))'
 
 
+Get Segment By Index
+--------------------
+
+Returns a segment of a by the one-based index of it.  If the index is out of
+range (below one or above the number of segments in the form), the empty string
+is returned.
+
+#(DS,segment,(
+  #(EQ,value,--,,(
+    #(GR,1,count,(value),(
+      #(segment,#(SU,count,1),form,##(CS,form,--))
+    ))
+  ))
+))
+#(sss,segment,(count,form,value))'
+
+
+Logic - And and Or
+------------------
+
+These two work by passing partial function calls.  For example, to test if a
+number is between -1 and 1 you would do:
+(
+  #(and,(GR,a,-1),(GR,1,a),between,not-between)
+)
+Any test that returns either a true or false value can be used, both built-in
+tests and any user-defined tests as well.  These can be nested if necessary,
+although that can become unreadable very quickly.  For example, test if "b" is
+in the interval ]-1,1[ or the interval ]2,3[:
+(
+  #(or,(and,(GR,b,-1),(GR,1,b)),(and,(GR,b,2),(GR,3,b)),true,false)
+)
+Both "and" and "or" are short-circuited, in other words, if the first test
+determines what the result is, the second test is not executed.
+
+#(DS,and,(
+  #(EQ,#(test1,T,F),T,(
+    #(EQ,#(test2,T,F),T,(true),(false))
+  ),(false))
+))
+#(sss,and,(test1,test2,true,false))'
+
+#(DS,or,(
+  #(EQ,#(test1,T,F),T,(true),(
+    #(EQ,#(test2,T,F),T,(true),(false))
+  ))
+))
+#(sss,or,(test1,test2,true,false))'
+
+
 #(PS,(success!
 ))'

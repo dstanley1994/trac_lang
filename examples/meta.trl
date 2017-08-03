@@ -9,16 +9,23 @@ This uses an internal index to create an "anonymous" form and return its name.
 Since it returns the name of the "anonymous" function, we can use the function
 as an object to pass to other scripts.
 
-#(DS,DAS,(
-  #(DS,fseq,#(AD,1,#(fseq)))
-  #(DS,f#(fseq),(<value>))
-  #(SS,f#(fseq),<args>)
-  f#(fseq)
+#(DS,lambda,(
+  #(DS,anon_seq,#(AD,1,#(anon_seq)))
+  #(DS,anon-#(anon_seq),(<value>))
+  #(SS,anon-#(anon_seq),<args>)
+  anon-#(anon_seq)
 ))
-#(sss,DAS,(<args>,<value>))'
+#(sss,lambda,(<args>,<value>))'
 
 Since a non-existent form returns the empty string, and the empty string is the
-same as zero, we don't need to initialize fseq.
+same as zero, we don't need to initialize anon_seq.
+
+Using lambda can fill your namespace with a bunch of anonymous functions that
+you no longer need.  So we need some way to delete all of them.  The following
+does that, and shows another way you can use lambda.  It doesn't have to be for
+functions, it can also work for anonymous data.
+
+#(DS,gc,(#(DD,anon-#(#(lambda,/,#(list-prefix,anon-,/)),(,anon-)))))
 
 
 Curry
@@ -28,11 +35,10 @@ Currying is to take a script that takes multiple arguments, fill in some of its
 arguments and return a script that will take the rest of the necessary 
 arguments and can be called at a later time.
 
-#(DS,curry,(#(DAS,(<y>),##(CL,<f>,<x>,<y>))))
+#(DS,curry,(#(lambda,(<y>),##(CL,<f>,<x>,<y>))))
 #(SS,curry,<f>,<x>)'
 
 Usage:
-
 (
   #(DS,func,#(curry,multi-arg-func,(a,b,c)))
   ...
@@ -40,12 +46,48 @@ Usage:
   
   Or another more concrete example:
   
+  We need to redefine primitives to curry them:
   #(DS,mult,(#(ML,a,b)))
   #(SS,mult,a,b)
-  #(DS,times5,#(curry,mult,5))
-  #(#(times5),6)  ==> 30
-  #(#(times5),13) ==> 65
+  
+  Now we define something that prints an action for each number 1 through 10.
+  
+  #(DS,1-10,(
+    #(EQ,count,10,,(
+      #(PS, #(action,#(AD,1,count)))
+      #(1-10,#(AD,1,count))
+    ))
+  ))
+  #(sss,1-10,(action,count))
+  
+  Print ten even numbers
+  #(1-10,#(curry,mult,2))
+  
+  Print ten multiples of five
+  #(1-10,#(curry,mult,5))
 )
+
+Currying doesn't have to be that formal with TRAC.  Since TRAC is a string
+language, you can define pieces of functions and then assemble them when
+necessary.  In the following, we define a sum function that takes two 
+lambdas, a test and a func.  
+
+#(DS,sum,(
+  #(#(test,start),total,(
+    #(sum,#(AD,1,start),test,func,#(AD,total,#(func,start)))
+  ))
+))
+#(sss,sum,(start,test,func,total))'
+
+You see here how we would sum up all the squares from one to five.  Notice that
+the first lambda is simply the first three arguments of the GR primitive.  When
+it is replaced in the definition of sum above, if GR is true, the running total
+if returned, otherwise sum is called again.  The GR primitive has been
+effectively curried, changed into a test that takes a single argument.
+(
+#(sum,1,#(lambda,n,(GR,n,5)),#(lambda,n,(#(ML,n,n))))
+)
+
 
 Combinators
 -----------
@@ -72,7 +114,7 @@ of function.  Here's an example for calculating the factorial.
 
 (
 #(DS,fact,(
-  #(DAS,<n>,(
+  #(lambda,<n>,(
     #(EQ,<n>,0,1,(
       #(ML,<n>,#(#(U,<f>),#(SU,<n>,1)))
     ))
@@ -110,7 +152,7 @@ creates a lot of identical anonymous functions.
 
 #(DS,Y,(
   #(U,(
-    #(DAS,<x>,(
+    #(lambda,<x>,(
       #(<f>,(#(U,<x>)))
     ))
   ))
@@ -126,9 +168,9 @@ the version of Y above and expand the definition of the U combinator.  If
 you've seen the Y combinator in other forms, you will see the resemblance here.  
 
 #(DS,Y,(
-  #(DAS,<x>,(
+  #(lambda,<x>,(
     #(<f>,(#(<x>,<x>)))
-  )),#(DAS,<x>,(
+  )),#(lambda,<x>,(
     #(<f>,(#(<x>,<x>)))
   ))
 ))
@@ -146,7 +188,7 @@ by the output of the script passed in.
 
 (
 #(DS,fact,(
-  #(DAS,<n>,(
+  #(lambda,<n>,(
     #(EQ,<n>,0,1,(
       #(ML,<n>,#(<f>,#(SU,<n>,1)))
     ))
@@ -161,7 +203,7 @@ Here's how you would count characters in a form using the Y combinator.
 
 (
 #(DS,count,(
-  #(DAS,<s>,(
+  #(lambda,<s>,(
     #(EQ,#(CC,<s>,**),**,0,(
       #(AD,1,#(<f>,<s>))
     ))

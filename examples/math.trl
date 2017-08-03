@@ -132,6 +132,30 @@ zero.
 #(sss,div?,(<a>,<b>,T,F,Z))'
 
 
+Greatest Common Divisor
+-----------------------
+
+Standard definition of greatest common divisor.
+
+#(DS,[gcd],(
+  #(eqn,<b>,0,<a>,(
+    #(gcd,<b>,#(mod,<a>,<b>))
+  ))
+))
+#(sss,[gcd],(<a>,<b>))'
+
+#(DS,gcd,(
+  #(sgn?,#(SU,<a>,<b>),(
+    #([gcd],<a>,<b>)
+  ),(
+    <a>
+  ),(
+    #([gcd],<b>,<a>)
+  ))
+))
+#(sss,gcd,(<a>,<b>))'
+
+
 Ceiling
 -------
 
@@ -156,7 +180,7 @@ Euclidean Division
 This division will truncate toward zero, instead of truncating down like normal
 TRAC division does.  The Z parameter is returned if b is zero.
 
-#(DS,DV+,(
+#(DS,DV0,(
   #(sgn?,<b>,(
     #(sgn?,<a>,(
       #(DV,<a>,<b>)
@@ -177,7 +201,19 @@ TRAC division does.  The Z parameter is returned if b is zero.
     ))
   ))
 ))
-#(sss,DV+,(<a>,<b>,Z))'
+#(sss,DV0,(<a>,<b>,Z))'
+
+
+Euclidean Modulo
+----------------
+
+Here's a modulo compatible with Euclidean division.  The Z parameter is
+returned if b is zero.
+
+#(DS,mod0,(
+  #(SU,<a>,#(ML,<b>,#(DV0,<a>,<b>,(Z))))
+))
+#(sss,mod0,(<a>,<b>,Z))'
 
 
 Decimal to Octal
@@ -277,10 +313,6 @@ This gives you a decimal expansion of a division.  By using the Euclidean
 division defined above, it works with both negative and positive numbers.
 
 #(DS,decimal-places,10)'
-#(DS,DVD,(
-  #(DV+,<a>,<b>,Z).#([DVD],#(ML,10,#(mod,#(abs,<a>),#(abs,<b>))),#(abs,<b>))
-))
-#(sss,DVD,(<a>,<b>,Z))'
 
 #(DS,[DVD],(
   #(GR,<p>,#(decimal-places),,(
@@ -289,6 +321,11 @@ division defined above, it works with both negative and positive numbers.
   ))
 ))
 #(sss,[DVD],(<a>,<b>,<p>))'
+
+#(DS,DVD,(
+  #(DV0,<a>,<b>,Z).#([DVD],#(ML,10,#(mod,#(abs,<a>),#(abs,<b>))),#(abs,<b>))
+))
+#(sss,DVD,(<a>,<b>,Z))'
 
 
 #(PS,(success!
