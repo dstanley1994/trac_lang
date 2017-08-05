@@ -3,30 +3,69 @@ Meta Programming
 
 #(PS,Loading examples/meta.trl...)'
 
-Anonymous functions
--------------------
-This uses an internal index to create an "anonymous" form and return its name.
-Since it returns the name of the "anonymous" function, we can use the function
-as an object to pass to other scripts.
+Anonymous forms
+---------------
 
-#(DS,lambda,(
-  #(DS,anon_seq,#(AD,1,#(anon_seq)))
-  #(DS,anon-#(anon_seq),(<value>))
-  #(SS,anon-#(anon_seq),<args>)
-  anon-#(anon_seq)
+We want to be able different classes of anonymous forms.  The following does
+that, creating a class of anonymous forms with the given name.  We first save a
+special prefix for the name of all the forms in the class.  Next we create the
+creating form, that will create members of the class.  It creates the member
+and then returns its name.  We can use the name like a function pointer to call
+the form whereever we want.  We next create a test form, that checks if the
+given name is a name of a form in our class.  We both test if the name is the
+name of a form and if the name starts with the form prefix.  The last form we
+create is for cleaning up.  When called it will delete all the forms of the 
+given class.
+
+#(DS,anonymous,(
+  #(DS,name-prefix,name..)
+  #(DS,name,(
+    #(DS,name-seq,#(AD,1,#(name-seq)))
+    #(DS,#(name-prefix)#(name-seq),(value))
+    #(SS,#(name-prefix)#(name-seq),args)
+    #(name-prefix)#(name-seq)
+  ))
+  #(SS,name,args,value)
+  #(DS,name-current,(#(name-prefix)#(name-seq)))
+  #(DS,name?,(
+    #(DS,name-test,(obj))
+    #(and,(EQ,#(IN,#(name-test),,-),-),
+          (EQ,#(IN,name-test,#(name-prefix),-)#(DD,name-test),),(T),(F))
+  ))
+  #(SS,name?,obj,T,F)
+  #(DS,name-gc,(
+    #(DS,to-delete,##(list-prefix,#(name-prefix),/))
+    #(SS,to-delete,/)
+    #(DD,#(name-prefix)##(to-delete,#(name-prefix)),to-delete)
+  ))
 ))
-#(sss,lambda,(<args>,<value>))'
+#(sss,anonymous,name)'
 
-Since a non-existent form returns the empty string, and the empty string is the
-same as zero, we don't need to initialize anon_seq.
+We'll use lambda to define anonymous functions.
 
-Using lambda can fill your namespace with a bunch of anonymous functions that
-you no longer need.  So we need some way to delete all of them.  The following
-does that, and shows another way you can use lambda.  It doesn't have to be for
-functions, it can also work for anonymous data.
+    #(anonymous,lambda)'
 
-#(DS,gc,(#(DD,anon-#(#(lambda,/,#(list-prefix,anon-,/)),(,anon-)))))
+It can be used as follows:
+(
+   #(lambda,n,(#(AD,1,n)))    => successor function
+   
+   #(lambda?,x,if-so,if-not)  => test if something is a lambda
+   
+   #(lambda-gc)               => deletes all lambdas
+)
 
+We'll use data to define anonymous pieces of data.
+
+    #(anonymous,data)'
+
+We use it similarly to lambda:
+(
+    #(data,(,),(1,2,3,4))           => array of numbers
+    
+    #(data?,formname,if-so,if-not)  => test if something is a data form
+    
+    #(data-gc)                      => delete all data forms
+)
 
 Curry
 -----

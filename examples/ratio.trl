@@ -11,21 +11,27 @@ The format of our rational numbers will be:
 numerator/denominator
 
 To work with them we will need a way of extracting the numerator and
-denominator from them.  As you can see, our lambda function is not only for
-creating anonymous functions; it can also be used to create anonymous data.
+denominator from them.  So we need our anonymous data form.  We use the default
+values for the segment form to make 0/1 the default rational.  The default
+denominator of one also means that whole numbers will be interpreted correctly,
+and so can be mixed in with rationals without a problem.
 
-#(DS,numr,(#(segment,1,#(lambda,/,x))))
+#(DS,numr,(#(segment,1,#(data,/,x),0)))
 #(SS,numr,x)'
 
-#(DS,dnmr,(#(segment,2,#(lambda,/,x))))
+#(DS,dnmr,(#(segment,2,#(data,/,x),1)))
 #(SS,dnmr,x)'
 
 Often we are going to need to pass a rational into a form as a separate
 numerator and denominator.  So it will be useful to have a function that
 changes a rational into a set of two parameters.  The following will replace
-the slash in a rational with a comma.
+the slash in a rational with a comma.  I could use CL to call the data and
+put the comma in the space between segments, but that wouldn't give me my
+default denominator of one which makes it possible to mix rationals and
+integers.  Also notice that I use the data-current call here, so that I don't
+have to duplicate the creation of the temporary data form.
 
-#(DS,argr,(#(CL,#(lambda,/,x),(,))))
+#(DS,argr,(#(segment,1,#(data,/,x),0),#(segment,2,#(data-current),1)))
 #(SS,argr,x)'
 
 Next we need a way of reducing fractions to standard form.  

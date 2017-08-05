@@ -45,18 +45,19 @@ and the "@".  They can't be typed in, but since editing is not done when
 reading a file, they can be entered in a file.  So here are definitions for 
 each.
 
+#(DS,backslash,\)'
+#(DS,at,@)'
+
 The meta character can be changed, so that a definition of the default meta 
 character single quote can be made.  
 
-The hash or number sign can easily be protected by parentheses, so doesn't need
-a definition at all.  However, parentheses themselves can't be defined, either 
-at a prompt or through a file.  
-
-#(DS,backslash,\)'
-#(DS,at,@)'
 #(CM,*)'
 #(DS,quote,')*
 #(CM,')*
+
+Both the hash or number sign and the comma can easily be protected by
+parentheses, so neither need a separate defintion.  However, parentheses
+themselves can't be defined, either at a prompt or through a file.  
 
 Some important characters:
 
@@ -67,6 +68,11 @@ Some important characters:
 #(DS,bell,)'
 #(DS,escape,)'
 #(DS,backspace,)'
+
+The following is the first control character, known as SOH.  We will use it as
+a delimiter sometimes, instead of using a printable character.
+
+#(DS,.,)'
 
 
 Character Classes
@@ -194,17 +200,23 @@ Get Segment By Index
 --------------------
 
 Returns a segment of a by the one-based index of it.  If the index is out of
-range (below one or above the number of segments in the form), the empty string
-is returned.
+range (below one or above the number of segments in the form), the default is
+returned.
 
 #(DS,segment,(
-  #(EQ,value,--,,(
-    #(GR,1,count,(value),(
-      #(segment,#(SU,count,1),form,##(CS,form,--))
+  #(DS,[seg],(
+    #(EQ,(value),#(.),(default),(
+      #(GR,2,count,(value),(
+        #([seg],#(SU,count,1),##(CS,form,#(.)))
+      ))
     ))
   ))
+  #(SS,[seg],count,value)
+  #(GR,1,index,(default),(
+    #([seg],index,#(CS,form,#(.)))#(CR,form)
+  ))
 ))
-#(sss,segment,(count,form,value))'
+#(sss,segment,(index,form,default))'
 
 
 Logic - And and Or

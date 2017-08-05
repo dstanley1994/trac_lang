@@ -1,0 +1,118 @@
+
+List Processing
+
+#(PS,Loading examples/list.trl...)'
+
+Basics
+------
+
+We need another anonymous form class for creating the links that make up lists.
+
+#(anonymous,link)'
+   
+We define nil as an empty list, containing nothing.
+
+#(DS,nil)'
+
+Now we can define the list primitives.  These are basically the same as used in
+Lisp.  Notice that I use the dot special character for delimiting, so that
+lists can contain any data.
+
+The cons form has some error checking because it's very easy to forget to put
+in the final nil when you're constructing a list.
+
+#(DS,cons,(
+  #(EQ,(list),,(
+    #(link,#(.),(value)#(.)nil)
+  ),(
+    #(link,#(.),(value)#(.)(list))
+  ))
+))
+#(sss,cons,(value,list))'
+#(DS,car,(#(CS,list)#(CR,list)))
+#(SS,car,list)'
+#(DS,cdr,(#(CS,list,,#(CS,list))#(CR,list)))
+#(SS,cdr,list)'
+
+#(DS,null?,(#(EQ,list,nil,(T),(F))))
+#(SS,null?,list,T,F)'
+
+Pair? is just a synonym for link?, the test that checks if the given value is a
+defined link.  Atom? is an antonym for link?.
+
+#(DS,pair?,(#(link?,item,(T),(F))))
+#(SS,pair?,item,T,F)'
+
+#(DS,atom?,(#(link?,item,(F),(T))))
+#(SS,atom?,item,T,F)'
+
+List is our synatic sugar for repeated cons'ing.  
+
+#(DS,list,(
+  #(DS,args,(objs))
+  #(SS,args,(,))
+  #(DS,[list],(
+    #(EQ,(value),#(.),nil,(
+      #(cons,(value),#([list],##(CS,args,#(.))))
+    ))
+  ))
+  #(SS,[list],value)
+  #([list],#(CS,args,#(.)))#(DD,args,[list])
+))
+#(sss,list,objs)'
+
+And it would be nice to be able to display the contents of our lists:
+
+#(DS,print-list,(
+  #(null?,<list>,nil,(
+    #(car,<list>)(,)#(print-list,#(cdr,<list>))
+  ))
+))
+#(sss,print-list,<list>)'
+
+
+Now with the basics of list handling defined, we can define some functions on
+lists.  These definitions are practically the same that you would see in any
+version of Lisp.  I got these definitions from section 2.2 of The Structure and
+Interpretation of Programs.
+
+#(DS,length,(#(null?,list,count,(#(length,#(cdr,list),#(AD,1,count))))))
+#(SS,length,list,count)'
+
+#(DS,append,(
+  #(null?,list1,list2,(
+    #(cons,#(car,list1),#(append,#(cdr,list1),list2))
+  ))
+))
+#(sss,append,(list1,list2))'
+
+#(DS,map,(
+  #(null?,items,nil,(
+    #(cons,#(proc,#(car,items)),#(map,proc,#(cdr,items)))
+  ))
+))
+#(sss,map,(proc,items))'
+
+#(DS,accumulate,(
+  #(null?,seq,init,(
+    #(op,#(car,seq),#(accumulate,op,init,#(cdr,seq)))
+  ))
+))
+#(sss,accumulate,(op,init,seq))'
+
+#(DS,interval,(
+  #(GR,low,high,nil,(
+    #(cons,low,#(interval,#(AD,1,low),high))
+  ))
+))
+#(sss,interval,(low,high))'
+
+Here's an example use.  Give the decimal expansion of the sum of the first five
+terms of the harmonic series:  1/1, 1/2, 1/3, etc.
+(
+   #(DVD,#(argr,#(accumulate,addr,0,#(map,rcpr,#(interval,1,5))))) => 2.283333333
+)
+
+
+#(PS,(success!
+))'
