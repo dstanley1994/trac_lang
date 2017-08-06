@@ -148,7 +148,7 @@ module TracLang
     # will display the Expression and wait for user input.  If the 
     # user presses enter, TRAC proceeds as normal.  If any other key
     # is pressed, the Executor is reset.
-    attr_reader :trace
+    attr_accessor :trace
     
     # Meta character to end input.  When the Executor is reading from a file,
     # it will only pass the string on to the Parser after a meta character is

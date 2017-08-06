@@ -20,6 +20,10 @@ module TracLang
           catch :reset do
             execute(idle)
           end
+          if @dispatch.trace
+            @dispatch.trace = false
+            puts 'Exiting trace...'
+          end
         end
       end
       puts 'Exiting...'
