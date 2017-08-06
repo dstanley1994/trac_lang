@@ -86,7 +86,10 @@ Here are some useful character classes.
 #(DS,whitespace,##(return)##(tab)##(space))'
 
 Here are some scripts for using the character classes.  These were inspired by
-TTM primitives that have the same names.
+TTM primitives that have the same names.  See page 20 and 21 of TTM: An 
+Experimental and Interpretive Language.
+
+https://github.com/Unidata/ttm/raw/master/ttm_interpretive_language_pr_07.pdf
 
 #(DS,[TCL],(
   #(EQ,(<c>),--,(Z),(
@@ -179,19 +182,19 @@ List Forms With Prefix
 One way to organize the list of defined forms is to prefix the name of related
 forms with a certain value.  For instance, all the color code definitions in
 the term.trl file are prefixed with "clr-".  This script allows you to list the
-only those forms.  I use "--" as a delimiter, so if you use that as a form
-name or part of a form name, this is not going to work right.
+only those forms.  Notice I use the dot special character as a delimiter, so
+you can use any printable character in your form names.
 
 The inner script [next] can't be scrubbed, because you might choose a
 whitespace delimiter.  So instead it has to be defined as a single line.
 
 #(DS,list-prefix,(
-  #(DS,[names],#(LN,--))
-  #(SS,[names],--)
+  #(DS,[names],#(LN,#(.)))
+  #(SS,[names],#(.))
   #(DS,[delimiter])
-  #(DS,[next],(#(EQ,<name>,--,,(#(DS,[name],<name>)#(EQ,#(IN,[name],prefix,--),,(##([delimiter])#([name])#(DS,[delimiter],(<delimiter>))))#([next],#(CS,[names],--))))))
+  #(DS,[next],(#(EQ,<name>,#(.),,(#(DS,[name],<name>)#(EQ,#(IN,[name],prefix,#(.)),,(##([delimiter])#([name])#(DS,[delimiter],(<delimiter>))))#([next],#(CS,[names],#(.)))))))
   #(SS,[next],<name>)
-  #([next],#(CS,[names],--))#(DD,[next],[names],[name],[delimiter])
+  #([next],#(CS,[names],#(.)))#(DD,[next],[names],[name],[delimiter])
 ))
 #(sss,list-prefix,(prefix,<delimiter>))'
 
@@ -199,9 +202,9 @@ whitespace delimiter.  So instead it has to be defined as a single line.
 Get Segment By Index
 --------------------
 
-Returns a segment of a by the one-based index of it.  If the index is out of
-range (below one or above the number of segments in the form), the default is
-returned.
+Returns a segment of a form by the one-based index of it.  If the index is out
+of range (below one or above the number of segments in the form), the default
+is returned.
 
 #(DS,segment,(
   #(DS,[seg],(

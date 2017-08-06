@@ -11,7 +11,7 @@ that, creating a class of anonymous forms with the given name.  We first save a
 special prefix for the name of all the forms in the class.  Next we create the
 creating form, that will create members of the class.  It creates the member
 and then returns its name.  We can use the name like a function pointer to call
-the form whereever we want.  We next create a test form, that checks if the
+the form wherever we want.  We next create a test form, that checks if the
 given name is a name of a form in our class.  We both test if the name is the
 name of a form and if the name starts with the form prefix.  The last form we
 create is for cleaning up.  When called it will delete all the forms of the 

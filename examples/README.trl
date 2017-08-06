@@ -22,7 +22,7 @@ Introduction
   There's a version of TRAC called MINT which was used to write a version of 
   EMACS called FreeMACS.  You can find a version of it here:
   
-    C++ Windows/Linux/MacOS X port of Russell Nelson's FreeMACS. 
+    C++ Windows/Linux/MacOS X port of Russell Nelson's FreeMACS:
     https://github.com/msandiford/Freemacs
 
   Another macro language that's similar to TRAC is TTM.  In the following PDF 
@@ -31,7 +31,26 @@ Introduction
   
     TTM: An Experimental Interpretive Language
     https://github.com/Unidata/ttm/raw/master/ttm_interpretive_language_pr_07.pdf
+    
+  There are some other implementations of TRAC.  
 
+  In Python:
+  
+     http://code.activestate.com/recipes/577366-trac-interpreter-sixties-programming-language/
+     
+     https://github.com/natkuhn/Trac-in-Python
+     
+   In Perl:
+   
+     At the RetroComputing Museum, search for "TRAC" on the page:
+     http://www.catb.org/retro/
+   
+   In Tcl/Tk:
+   
+     Here someone creates a TRAC-like interpreter in Tcl/Tk:
+     http://wiki.tcl.tk/11314
+   
+     
 
 Using TRAC
 -------------------------------------------------------------------------------
@@ -365,9 +384,10 @@ TRAC Commands
      Let value be the empty string, something that will never be found in an
      existing form.  
      (
-       #(IN,x123,,no)
-       If a form with the name x123 exists, "no" will be returned.  Otherwise
-       the empty string will be returned since the form doesn't exist.
+       #(IN,x123,,exists)
+       If a form with the name x123 exists, "exists" will be returned.
+       Otherwise the empty string will be returned since the form doesn't
+       exist.
      )
      
   CR Call Return  (  #(CR,name)  )
@@ -410,7 +430,9 @@ TRAC Commands
      Result:  Empty string
   
      Saves the given forms in a file with the given name and an extension of
-     .trl in the default save directory.  The listed forms will be removed from
+     .trl in the default save directory.  The file format will be a text file
+     with TRAC commands in it for defining, segmenting and possibly moving the
+     form pointer of the given forms.  The listed forms will be removed from
      the list of definitions, and a new form will be created, with the same
      name as the block name.  This form will be used in the following command.
      
@@ -527,7 +549,9 @@ Example Files
                 the rest of the files
   term.trl	Terminal control with ANSI escape codes
   math.trl	Definition of some basic mathematical functions
+  ratio.trl     Rational numbers defined in TRAC
   meta.trl	Meta-programming including combinators
+  list.trl      List commands written in TRAC
   golf.trl	A few code golf attempts
   
 

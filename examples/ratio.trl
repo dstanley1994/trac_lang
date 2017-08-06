@@ -94,5 +94,14 @@ Tests
 #(SS,NaN?,x,T,F)'
 
 
+Now we can use rational numbers, and even mix integers in with them. 
+(
+    #(subr,1,1/3)              => 2/3
+    #(mulr,5/7,14)             => 10/1
+    #(grr,5/7,2/3,true,false)  => true
+    #(rcpr,2)                  => 1/2
+)
+
+
 #(PS,(success!
 ))'

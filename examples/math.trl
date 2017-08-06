@@ -3,6 +3,14 @@ Mathematics
 
 #(PS,Loading examples/math.trl...)'
 
+
+One of the things you have to be careful with TRAC numbers is the fact that any
+string is a number.  If the string doesn't have any numeric characters at the
+end of it, it's considered zero.  That means that abc, --0 and the empty string
+are all equal to zero.  Because of this property, you can't normally use EQ to
+test numbers.
+
+
 Negate
 ------
 
@@ -41,7 +49,7 @@ Sign Case
 ---------
 
 This creates a control statement which executes different code depending on
-what sign the given number is.  This simplifies some of our later code.
+what sign the given number is.  This simplifies some of our later code.  
 
 #(DS,sgn?,(
   #(GR,<a>,0,(P),(
@@ -50,17 +58,22 @@ what sign the given number is.  This simplifies some of our later code.
 ))
 #(sss,sgn?,(<a>,P,Z,N))
 
+We use this as follows:
+(
+    #(sgn?,#(a),positive!,zero.,negative)
+)
+
 
 Numeric Equal
 -------------
+
 The EQ command in TRAC compares strings, not numbers.  To compare numbers you
 need to use the GR command.  If neither of two numbers is greater then they
-must be equal.
+must be equal.  It looks really weird to test if a > b and b > a, but because
+of the short-circuit propery of and, it works.  
 
 #(DS,eqn,(
-  #(GR,a,b,(F),(
-    #(GR,b,a,(F),(T))
-  ))
+  #(and,(GR,a,b),(GR,b,a),(F),(T))
 ))
 #(sss,eqn,(a,b,T,F))'
 
@@ -135,7 +148,8 @@ zero.
 Greatest Common Divisor
 -----------------------
 
-Standard definition of greatest common divisor.
+Standard definition of greatest common divisor.  The [gcd] form tests positive
+integers, while the gcd form works for all integers.
 
 #(DS,[gcd],(
   #(eqn,<b>,0,<a>,(
@@ -250,8 +264,13 @@ and then interpret each character as a number.
 Random
 ------
 
-Now we can define a random number generator.  Remember to define the seed value
-to an octal number before you call random the first time.
+Now we can define a random number generator.  This is a linear congruential
+generator from Wikipedia, using the Borland C/C++ multiplier.
+
+https://en.wikipedia.org/wiki/Linear_congruential_generator
+
+Remember to define the seed value to an octal number before you call random the
+first time.
 
 #(DS,random,(
   #(DS,seed,
@@ -293,7 +312,7 @@ Power of Two
 
 This should be much faster than calling the usual power script.
 
-#(DS,power2,(#(to_dec,#(BS,1,n))))
+#(DS,power2,(#(to_dec,1#(times,n,0))))
 #(SS,power2,n)'
 
 

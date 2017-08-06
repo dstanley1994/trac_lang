@@ -85,15 +85,17 @@ hash, open-paren, close-paren, comma, D and S
 
 With these six characters, you have the commands DS, SS, and DD.  
 
-How do you define branching?  We see on page .. of ...
+How do you define branching?  We can use the fact that when you define a form
+with the same name as an existing form, the existing form is replaced.  This
+technique comes from page 19 of Chapter 9 of the Beginner's Manual for TRAC
+Language:
 
+https://web.archive.org/web/20050214150205/http://tracfoundation.org:80/trac64/T64manual.htm
 (
 #(DS,DDD,(#(DS,(DDS),(SDD))#(DS,(DSD),(DSS))#((DDS))))
 #(SS,DDD,DDS,DSD,DSS,SDD)
 )
-
 Ungolfed version:
-
 (
 #(DS,"eq",
   (#(DS,(a),(F))
@@ -103,7 +105,8 @@ Ungolfed version:
 #(SS,"eq",a,b,T,F)
 )
 
-If a equals b, then the definition of b will overwrite the definition of a, 
+If a equals b, then the definition of b will overwrite the definition of a, and
+T will be returned.  Otherwise, F will be returned.
 
 
 #(PS,(success!
