@@ -247,6 +247,13 @@ RSpec.describe Form do
       
     end
     
+    context 'empty search string' do
+      it 'raises error' do
+        f = Form.new('abc')
+        expect{f.in_neutral('')}.to raise_error(Form::EndOfStringError)
+      end
+    end
+    
     context 'gaps in middle' do
       it 'can\'t find over segment gaps' do
         f = Form.new('abcdefg')

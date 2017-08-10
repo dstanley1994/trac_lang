@@ -128,9 +128,9 @@ class TracLang::Form
   # characters between the current pointer and the start of the match, 
   # while moving the character pointer past the match.  Raises an 
   # EndOfStringError if you are at the end of the form or no match is
-  # found.  A match cannot span segment gaps.
+  # found.  An empty search string counts as always not matching.
   def in_neutral(search, *)
-    raise EndOfStringError if @cp == @value.length
+    raise EndOfStringError if @cp == @value.length || search.empty?
     found = find(search, @cp)
     if found
       result = @value[@cp...found]
