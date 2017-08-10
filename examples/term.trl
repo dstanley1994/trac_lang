@@ -27,7 +27,10 @@ First we define the codes for effects:
 8 hidden))'
 
 #(SS,effect-list,( ),##(CL,return))'
- 
+
+Notice how I segment the effect-list by spaces and newlines.  That makes it
+easy to write readable lists in your code.
+
 Discard first empty segment: #(CS,effect-list)'
 
 #(define-effect,#(CS,effect-list))'

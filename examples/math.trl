@@ -267,7 +267,7 @@ Random
 Now we can define a random number generator.  This is a linear congruential
 generator from Wikipedia, using the Borland C/C++ multiplier.
 
-https://en.wikipedia.org/wiki/Linear_congruential_generator
+    https://en.wikipedia.org/wiki/Linear_congruential_generator
 
 Remember to define the seed value to an octal number before you call random the
 first time.

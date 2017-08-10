@@ -1,0 +1,159 @@
+
+Data Structures
+
+#(PS,Loading examples/data.trl...)'
+
+Stack
+-----
+
+Here's an implementation of a stack in TRAC.  
+
+Our first definition is push.  The complicated expression at the start is
+checking if our stack exists yet or if it is empty.  If either is true, set the
+stack to the value given.  Otherwise, add the value to the top of the stack.
+Because of the error checking, we don't have to create a stack before using it.
+We can just push something onto it to create it.
+
+#(DS,push,(
+  #(or,(not,(exists,name)),(EQ,##(CL,name),),(
+    #(DS,name,(value))
+  ),(
+    #(DS,name,(value)#(.)##(CL,name,#(.)))
+  ))
+  #(SS,name,#(.))
+))
+#(sss,push,(name,value))'
+
+Now, pop a value off the top of the stack.  If the stack is empty, return the
+ifempty parameter.  Here we see the form pointer in action.  The CS call moves
+the form pointer after the end of the first segment, so the CL call in the next
+line only returns the rest of the stack.  This works because DS and SS return
+the empty string, so the return from CS is the return from the pop function.
+If the stack doesn't exist, this will have the side-effect of creating an empty
+stack.
+
+#(DS,pop,(
+  #(CS,name,ifempty)
+  #(DS,name,##(CL,name,#(.)))
+  #(SS,name,#(.))
+))
+#(sss,pop,(name,ifempty))'
+
+Finally, peek at the top of the stack without removing the value.
+
+#(DS,peek,(
+  #(CS,name,ifempty)
+  #(CR,name)
+))
+#(sss,peek,(name,ifempty))'
+
+
+Queue
+-----
+
+A queue is very similar to a stack, we just add things to the end of the string
+instead of the beginning.  Dequeue is just a synonym for pop, and peek works on
+both stacks and queues.
+
+#(DS,enqueue,(
+  #(or,(not,(exists,name)),(EQ,##(CL,name),),(
+    #(DS,name,(value))
+  ),(
+    #(DS,name,##(CL,name,#(.))#(.)(value))
+  ))
+  #(SS,name,#(.))
+))
+#(sss,enqueue,(name,value))'
+
+#(DS,dequeue,##(CL,pop,name,ifempty))
+#(SS,dequeue,name,ifempty)'
+
+
+Hash
+----
+
+A hash piggybacks on the form dictionary.  The hash name and key are mashed
+together to make the name of the form that holds the corresponding value.  From
+this we can easily define all the typical hash methods.
+
+#(DS,put,(#(DS,name:key,value)))
+#(SS,put,name,key,value)'
+
+#(DS,get,(#(name:key)))
+#(SS,get,name,key)'
+
+#(DS,contains,(#(exists,name:key,(T),(F))))
+#(SS,contains,name,key,T,F)'
+
+#(DS,keys,(#(list-prefix,name:,delimiter)))
+#(SS,keys,name,delimiter)'
+
+#(DS,delete-hash,(#(DD,#(list-prefix,name:,(,)))))
+#(SS,delete-hash,name)'
+
+An array is just a special kind of hash that uses numbers for keys, and a set
+is just a hash where you ignore the values set.
+
+There's one other trick you can do with hashes.  By creating the following two
+functions, you can make a hash into a primitive object, with methods as well as
+data.
+
+#(DS,define,(
+  #(DS,name:method,(action))
+  #(SS,name:method,args)
+))
+#(sss,define,(name,method,args))'
+
+#(DS,call,(#(CL,name:method,args)))
+#(SS,call,name,method,args)'
+
+A hash with such methods isn't a true object - it doesn't have a defining class
+and there's no such thing as inheritance.  
+
+
+Case
+----
+
+Here's the case statement, so TRAC can be routed to different actions based on
+the value of something.  It may seem strange to have a control structure in the
+example file for data structures, but really, control structures *are* data
+structures.  The case statement is just a special kind of hash with a default
+value.  
+
+#(DS,case,(
+  #(DS,case:(test),(action))
+))
+#(sss,case,(test,action))'
+
+#(DS,default,(
+  #(DS,case:default,(action))
+  #(SS,case:default,value)
+))
+#(sss,default,action)'
+
+#(DS,exe-case,(
+  #(exists,case:(value),(
+    #(case:(value))
+  ),(
+    #(case:default,(value))
+  ))
+  #(delete-hash,case)
+))
+#(sss,exe,value)'
+
+Here is an example use.  Just list all the cases you have and then an optional
+default.  If no default is set, then no action is taken on default.
+(
+  #(case,d,(#(delete-file)))
+  #(case,g,(#(get-file)))
+  #(case,q,(#(HL)))
+  #(default,(#(PS,#(help-text))))
+  #(exe-case,#(RC))
+)
+The same way TRAC is backward by having the list of arguments *after* the
+function definition, the value to put into a case statement comes after the
+case statement is defined.  
+
+
+#(PS,(success!
+))'

@@ -28,15 +28,11 @@ given class.
   #(SS,name,args,value)
   #(DS,name-current,(#(name-prefix)#(name-seq)))
   #(DS,name?,(
-    #(DS,name-test,(obj))
-    #(and,(EQ,#(IN,#(name-test),,-),-),
-          (EQ,#(IN,name-test,#(name-prefix),-)#(DD,name-test),),(T),(F))
+    #(and,(exists,(obj)),(starts-with,(obj),#(name-prefix)),(T),(F))
   ))
   #(SS,name?,obj,T,F)
   #(DS,name-gc,(
-    #(DS,to-delete,##(list-prefix,#(name-prefix),/))
-    #(SS,to-delete,/)
-    #(DD,#(name-prefix)##(to-delete,#(name-prefix)),to-delete)
+    #(DD,#(list-prefix,#(name-prefix),(,)))
   ))
 ))
 #(sss,anonymous,name)'
