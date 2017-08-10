@@ -176,6 +176,34 @@ of a form.
 #(sss,end,<form>)'
 
 
+Form Exists
+-----------
+
+This relies on a odd property of IN.  If you search for the empty string in a
+form using IN, if the form doesn't exist, the empty string is returned.  If the
+form does exist, searching for the empty string will fail, and so the 
+"not found" parameter will be returned.  We can use this to create a test for
+the existence of a form.
+
+#(DS,exists,(#(EQ,#(IN,form,,notfound),notfound,(T),(F))))
+#(SS,exists,form)'
+
+
+Starts With
+-----------
+
+Tests if a given string starts with a given value.  Notice that I have to
+define a form with the string to search in and then delete it when I'm done
+with it.  I use the special character as the temporary name, so that I don't
+overwrite an existing form.
+
+#(DS,starts-with,(
+  #(DS,#(.),(string1))
+  #(EQ,#(IN,#(.),(string2),-),,#(DD,#(.))(T),(F))
+))
+#(sss,starts-with,(string1,string2,T,F))
+
+
 List Forms With Prefix
 ----------------------
 
@@ -185,16 +213,24 @@ the term.trl file are prefixed with "clr-".  This script allows you to list the
 only those forms.  Notice I use the dot special character as a delimiter, so
 you can use any printable character in your form names.
 
-The inner script [next] can't be scrubbed, because you might choose a
-whitespace delimiter.  So instead it has to be defined as a single line.
-
 #(DS,list-prefix,(
   #(DS,[names],#(LN,#(.)))
   #(SS,[names],#(.))
   #(DS,[delimiter])
-  #(DS,[next],(#(EQ,<name>,#(.),,(#(DS,[name],<name>)#(EQ,#(IN,[name],prefix,#(.)),,(##([delimiter])#([name])#(DS,[delimiter],(<delimiter>))))#([next],#(CS,[names],#(.)))))))
+  #(DS,[next],(
+    #(EQ,<name>,#(.),,(
+      #(DS,[name],<name>)
+      #(EQ,#(IN,[name],prefix,#(.)),,(
+        #(CR,[name])
+        ##([delimiter])#([name])
+        #(DS,[delimiter],(<delimiter>))
+      ))
+      #([next],#(CS,[names],#(.)))
+    ))
+  ))
   #(SS,[next],<name>)
-  #([next],#(CS,[names],#(.)))#(DD,[next],[names],[name],[delimiter])
+  #([next],#(CS,[names],#(.)))
+  #(DD,[next],[names],[name],[delimiter])
 ))
 #(sss,list-prefix,(prefix,<delimiter>))'
 
@@ -222,11 +258,11 @@ is returned.
 #(sss,segment,(index,form,default))'
 
 
-Logic - And and Or
-------------------
+Logic - And, Or and Not
+-----------------------
 
-These two work by passing partial function calls.  For example, to test if a
-number is between -1 and 1 you would do:
+These work by passing partial function calls.  For example, to test if a number
+is between -1 and 1 you would do:
 (
   #(and,(GR,a,-1),(GR,1,a),between,not-between)
 )
@@ -254,6 +290,29 @@ determines what the result is, the second test is not executed.
 ))
 #(sss,or,(test1,test2,true,false))'
 
+And here's the implementation of not.  Just pass it a partial test, same as you
+do for "and" and "or".
+
+#(DS,not,(#(test,(F),(T))))
+#(SS,not,test,T,F)'
+
 
 #(PS,(success!
 ))'
+
+
+Load Other Files
+----------------
+
+#(DS,term,term.trl)
+#(FB,term)'
+#(DS,math,math.trl)
+#(FB,math)'
+#(DS,meta,meta.trl)
+#(FB,meta)'
+#(DS,ratio,ratio.trl)
+#(FB,ratio)'
+#(DS,data,data.trl)
+#(FB,data)'
+#(DS,list,list.trl)
+#(FB,list)'

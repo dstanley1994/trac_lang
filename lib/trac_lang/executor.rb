@@ -32,13 +32,28 @@ module TracLang
 
     # Executes TRAC from a file.
     def load_file(filename)
+      full_file = File.expand_path(filename, @dispatch.save_dir)
+      save_dir(full_file)
       begin
-        File.new(filename, 'r').each do |line|
-          break unless load(filename, $., line)
+        File.new(full_file, 'r').each do |line|
+          break unless load(full_file, $., line)
         end
       rescue
-        puts "Error loading file #{filename}"
+        puts "Error loading file #{full_file}"
       end
+      restore_dir
+    end
+    
+    # Saves original save_dir from dispatch, set dispatch save_dir to
+    # dir of given filename.
+    def save_dir(filename)
+      @save_save_dir = @dispatch.save_dir
+      @dispatch.save_dir = File.dirname(filename)
+    end
+    
+    # Restores saved directory.
+    def restore_dir()
+      @dispatch.save_dir = @save_save_dir
     end
     
     # Executes a line of TRAC loaded from a file.  If an error occurs, an error

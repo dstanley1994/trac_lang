@@ -45,17 +45,16 @@ def print_error(error)
 end
 
 begin 
-  puts 'parsing options, creating dispatch'
   d = TracLang::Dispatch.new(parse_options)
-  puts 'creating executor'
   e = TracLang::Executor.new(d)
-  puts 'start process loop'
   catch :done do
     last_file = ''
     last_line = 0
     current_line = 1
     ARGF.each_line do |line|
       if ARGF.filename != last_file
+        e.restore_dir unless last_file.empty?
+        e.save_dir(ARGF.filename)
         current_line = 1
         last_file = ARGF.filename
       else
@@ -63,9 +62,8 @@ begin
       end
       e.load(ARGF.filename, current_line, line)
     end
-    puts 'finished files'
     exit if parse_options[:exit_on_eof]
-    puts 'start prompt'
+    e.restore_dir
     e.prompt
   end
   puts 'Exiting...'

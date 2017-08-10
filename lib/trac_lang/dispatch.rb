@@ -150,6 +150,9 @@ module TracLang
     # is pressed, the Executor is reset.
     attr_accessor :trace
     
+    # Directory that blocks are read from and written to.  
+    attr_accessor :save_dir
+    
     # Meta character to end input.  When the Executor is reading from a file,
     # it will only pass the string on to the Parser after a meta character is
     # received.  Also, the TRAC #(RS) command will only return after a meta
