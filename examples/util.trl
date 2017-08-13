@@ -56,8 +56,17 @@ character single quote can be made.
 #(CM,')*
 
 Both the hash or number sign and the comma can easily be protected by
-parentheses, so neither need a separate defintion.  However, parentheses
-themselves can't be defined, either at a prompt or through a file.  
+parentheses, so neither need a separate defintion.  Here's how parentheses can
+be defined:
+
+#(DS,parens,(()))
+#(DS,open-paren,##(CC,parens))
+#(DS,close-paren,##(CC,parens))
+#(DD,parens)'
+
+However, even if you use a neutral call, unmatched parens can only be passed to
+a TRAC primitive.  You can't pass them to a form you define, because once the 
+form is expanded, the parens will no longer match.
 
 Some important characters:
 
@@ -162,6 +171,27 @@ have to call CR beforehand.
 #(sss,count,(<f>,<tot>))'
 
 
+Concatenate
+-----------
+
+Add given characters to the end of a given form.  A very simple definition, but
+useful when you only have one reference to the form you want to concatenate on.
+
+#(DS,concat,(#(DS,form,##(CL,form)(str))))
+#(SS,concat,form,str)'
+
+
+Increment
+---------
+
+Another very simple definition of something that's easy to do.  But it's also
+easy to forget that the form "num" needs to executed for the AD to work, in 
+which case you end up with one as your value, instead of what you want.
+
+#(DS,inc,(#(DS,num,#(AD,#(num),1))))
+#(SS,inc,num)'
+
+
 Move To End
 -----------
 Move to the end of a form.  This is relatively simple, but it sure would be
@@ -186,7 +216,7 @@ form does exist, searching for the empty string will fail, and so the
 the existence of a form.
 
 #(DS,exists,(#(EQ,#(IN,form,,notfound),notfound,(T),(F))))
-#(SS,exists,form)'
+#(SS,exists,form,T,F)'
 
 
 Starts With
@@ -245,7 +275,7 @@ is returned.
 #(DS,segment,(
   #(DS,[seg],(
     #(EQ,(value),#(.),(default),(
-      #(GR,2,count,(value),(
+      #(GR,2,count,#(CR,form)(value),(
         #([seg],#(SU,count,1),##(CS,form,#(.)))
       ))
     ))
