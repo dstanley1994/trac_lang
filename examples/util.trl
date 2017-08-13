@@ -342,7 +342,7 @@ Load Other Files
 #(FB,meta)'
 #(DS,ratio,ratio.trl)
 #(FB,ratio)'
-#(DS,data,data.trl)
-#(FB,data)'
+#(DS,struct,struct.trl)
+#(FB,struct)'
 #(DS,list,list.trl)
 #(FB,list)'
