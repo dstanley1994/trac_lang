@@ -1,7 +1,7 @@
 
 Data Structures
 
-#(PS,Loading examples/data.trl...)'
+#(PS,Loading examples/struct.trl...)'
 
 Stack
 -----
@@ -108,7 +108,8 @@ data.
 #(SS,call,name,method,args)'
 
 A hash with such methods isn't a true object - it doesn't have a defining class
-and there's no such thing as inheritance.  
+and there's no such thing as inheritance.  But it's still an example of data
+and functions bound together in one object.
 
 
 Case
@@ -139,10 +140,12 @@ value.
   ))
   #(delete-hash,case)
 ))
-#(sss,exe,value)'
+#(sss,exe-case,value)'
 
 Here is an example use.  Just list all the cases you have and then an optional
-default.  If no default is set, then no action is taken on default.
+default.  If no default is set, then no action is taken on default.  The value
+that was read is passed to the default action in case we want to do something
+with it.
 (
   #(case,d,(#(delete-file)))
   #(case,g,(#(get-file)))
