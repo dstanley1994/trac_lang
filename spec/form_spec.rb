@@ -159,6 +159,16 @@ RSpec.describe Form do
         expect(f.call_n('100')).to eq('abcd')
       end
       
+      it 'throws end of string even if n == 0' do
+        f = Form.new('abcd')
+        expect(f.call_n('4')).to eq('abcd')
+        expect {f.call_n('0')}.to raise_error(Form::EndOfStringError)
+      end
+      
+      it 'throws end of string for n == -0 when at beginning' do
+        f = Form.new('abcd')
+        expect {f.call_n('-0')}.to raise_error(Form::EndOfStringError)
+      end
     end
     
   end

@@ -72,10 +72,10 @@ class TracLang::Form
   
   # Increments the character pointer by the given amount.
   def increment(n = 1)
-    @sp = 0
     @cp += n
     @cp = @value.length if @cp > @value.length
     @cp = 0 if @cp < 0
+    @sp = n > 0 ? 0 : @segments[@cp].length
   end
 
   # Returns the pointers to the start of the form.  
@@ -105,6 +105,7 @@ class TracLang::Form
     tn = TracLang::Decimal.new(nstr)
     n = tn.value
     if tn.negative?
+      raise EndOfStringError if @cp == 0 && @sp == 0
       # move left of seg gaps
       @sp = 0
       return '' if n == 0
@@ -113,6 +114,7 @@ class TracLang::Form
       result = @value.slice(@cp + n, -n)
       increment(n)
     else
+      raise EndOfStringError if @value.length - @cp == 0 && @sp == @segments[@cp].length
       # move right of seg gaps
       @sp = @segments[@cp].length
       return '' if n == 0
