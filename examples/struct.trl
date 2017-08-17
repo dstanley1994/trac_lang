@@ -15,7 +15,7 @@ Because of the error checking, we don't have to create a stack before using it.
 We can just push something onto it to create it.
 
 #(DS,push,(
-  #(or,(not,(exists,name)),(EQ,##(CL,name),),(
+  #(or,(not,(exists?,name)),(EQ,##(CL,name),),(
     #(DS,name,(value))
   ),(
     #(DS,name,(value)#(.)##(CL,name,#(.)))
@@ -56,7 +56,7 @@ instead of the beginning.  Dequeue is just a synonym for pop, and peek works on
 both stacks and queues.
 
 #(DS,enqueue,(
-  #(or,(not,(exists,name)),(EQ,##(CL,name),),(
+  #(or,(not,(exists?,name)),(EQ,##(CL,name),),(
     #(DS,name,(value))
   ),(
     #(DS,name,##(CL,name,#(.))#(.)(value))
@@ -82,7 +82,7 @@ this we can easily define all the typical hash methods.
 #(DS,get,(#(name:key)))
 #(SS,get,name,key)'
 
-#(DS,contains,(#(exists,name:key,(T),(F))))
+#(DS,contains,(#(exists?,name:key,(T),(F))))
 #(SS,contains,name,key,T,F)'
 
 #(DS,keys,(#(list-prefix,name:,delimiter)))
@@ -121,41 +121,55 @@ example file for data structures, but really, control structures *are* data
 structures.  The case statement is just a special kind of hash with a default
 value.  
 
-#(DS,case,(
-  #(DS,case:(test),(action))
+#(DS,case,(#(DS,case-prefix,name)))
+#(SS,case,name)'
+
+#(DS,when,(
+  #(DS,#(case-prefix):(value),(action))
+  #(scrub,#(case-prefix):(value))
 ))
-#(sss,case,(test,action))'
+#(SS,when,value,action)'
 
 #(DS,default,(
-  #(DS,case:default,(action))
-  #(SS,case:default,value)
+  #(DS,#(case-prefix):default,(action))
+  #(sss,#(case-prefix):default,value)
 ))
 #(sss,default,action)'
 
-#(DS,exe-case,(
-  #(exists,case:(value),(
-    #(case:(value))
-  ),(
-    #(case:default,(value))
+#(DS,end-case,(
+  #(DS,[end-case],(
+    #(DS,prefix,(
+      #(exists?,prefix:(value),(
+        #(prefix:(value))
+      ),(
+        #(prefix:default,(value))
+      ))
+    ))
+    #(SS,prefix,value)
   ))
-  #(delete-hash,case)
+  #(SS,[end-case],prefix)
+  #([end-case],#(case-prefix))
 ))
-#(sss,exe-case,value)'
+#(sss,end-case,name)'
 
-Here is an example use.  Just list all the cases you have and then an optional
-default.  If no default is set, then no action is taken on default.  The value
-that was read is passed to the default action in case we want to do something
-with it.
+These are defining words - in other words, they define pieces of code, so they
+should be used at the same level as you use DS and other defining words.  The
+example will make things more clear.  
+
 (
-  #(case,d,(#(delete-file)))
-  #(case,g,(#(get-file)))
-  #(case,q,(#(HL)))
+  Defining the code to run:
+  
+  #(case,execute-option)
+  #(when,d,(#(delete-file)))
+  #(when,g,(#(get-file)))
+  #(when,q,(#(HL)))
   #(default,(#(PS,#(help-text))))
-  #(exe-case,#(RC))
+  #(end-case)
+  
+  Actually calling the code:
+  
+  #(execute-option,#(RC))
 )
-The same way TRAC is backward by having the list of arguments *after* the
-function definition, the value to put into a case statement comes after the
-case statement is defined.  
 
 
 #(PS,(success!
