@@ -20,7 +20,26 @@ Or install it yourself as:
 
 ## Usage
 
-TODO: Write usage instructions here
+Once it's installed, you can run:
+
+    $ trac_lang
+    
+from the command line to start the TRAC interpreter.  You can also give it a file name of a file with TRAC commands in it to load those commands before you start the interpreter.  Try the examples/util.trl file to get a number of useful utilities loaded.  
+
+TRAC is a macro language, meaning it consists solely of replacing strings of text with other strings.  In spite of this simplicity, it is surprisingly powerful, to the point where you can create a version of the Y combinator, as follows:
+
+#(DS,Y,(
+  #(#(lambda,<x>,(
+    #(<f>,(#(<x>,<x>)))
+  )),#(lambda,<x>,(
+    #(<f>,(#(<x>,<x>)))
+  )))
+))
+##(SS,Y,<f>)
+
+You can read about the different TRAC commands available in the examples/README.trl file, or read the original manual by the creator of TRAC, Calvin Mooers:
+
+https://web.archive.org/web/20050205173449/http://tracfoundation.org:80/t64tech.htm
 
 ## Development
 
