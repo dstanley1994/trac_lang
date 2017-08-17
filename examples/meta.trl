@@ -203,11 +203,12 @@ the version of Y above and expand the definition of the U combinator.  If
 you've seen the Y combinator in other forms, you will see the resemblance here.  
 
 #(DS,Y,(
-  #(lambda,<x>,(
+  #(#(lambda,<x>,(
     #(<f>,(#(<x>,<x>)))
   )),#(lambda,<x>,(
     #(<f>,(#(<x>,<x>)))
   ))
+  )
 ))
 #(sss,Y,<f>)'
 
