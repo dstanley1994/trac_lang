@@ -29,13 +29,13 @@ from the command line to start the TRAC interpreter.  You can also give it a fil
 TRAC is a macro language, meaning it consists solely of replacing strings of text with other strings.  In spite of this simplicity, it is surprisingly powerful, to the point where you can create a version of the Y combinator, as follows:
 
 #(DS,Y,(
-  #(#(lambda,<x>,(
-    #(<f>,(#(<x>,<x>)))
-  )),#(lambda,<x>,(
-    #(<f>,(#(<x>,<x>)))
+  #(#(lambda,x,(
+    #(f,(#(x,x)))
+  )),#(lambda,x,(
+    #(f,(#(x,x)))
   )))
 ))
-##(SS,Y,<f>)
+#(SS,Y,f)
 
 You can read about the different TRAC commands available in the examples/README.trl file, or read the original manual by the creator of TRAC, Calvin Mooers:
 
