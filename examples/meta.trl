@@ -28,7 +28,7 @@ given class.
   #(SS,name,args,value)
   #(DS,name-current,(#(name-prefix)#(name-seq)))
   #(DS,name?,(
-    #(and,(exists,(obj)),(starts-with,(obj),#(name-prefix)),(T),(F))
+    #(and,(exists?,(obj)),(starts-with,(obj),#(name-prefix)),(T),(F))
   ))
   #(SS,name?,obj,T,F)
   #(DS,name-gc,(
