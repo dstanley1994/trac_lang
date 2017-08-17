@@ -177,8 +177,11 @@ Concatenate
 Add given characters to the end of a given form.  A very simple definition, but
 useful when you only have one reference to the form you want to concatenate on.
 
-#(DS,concat,(#(DS,form,##(CL,form)(str))))
-#(SS,concat,form,str)'
+#(DS,concat,(
+  #(DS,form,##(CL,form,args)(str))
+  #(SS,form,args)
+))
+#(sss,concat,(form,args,str))'
 
 
 Increment
@@ -206,6 +209,21 @@ of a form.
 #(sss,end,<form>)'
 
 
+At End Or Beginning?
+--------------------
+Test if you are at the end of a form.  This uses a special trick of TRAC, when
+the form pointer is at the end of a form, CN returns the end-of-form argument
+even when you ask for zero characters.  The same trick works at the beginning
+of a form when you use negative zero.  This trick is the whole reason that 
+negative zero exists in TRAC.
+
+#(DS,end?,(#(EQ,#(CN,form,0,#(.)),#(.),(T),(F))))
+#(SS,end?,form,T,F)'
+
+#(DS,start?,(#(EQ,#(CN,form,-0,#(.)),#(.),(T),(F))))
+#(SS,start?,form,T,F)'
+
+
 Form Exists
 -----------
 
@@ -215,8 +233,8 @@ form does exist, searching for the empty string will fail, and so the
 "not found" parameter will be returned.  We can use this to create a test for
 the existence of a form.
 
-#(DS,exists,(#(EQ,#(IN,form,,notfound),notfound,(T),(F))))
-#(SS,exists,form,T,F)'
+#(DS,exists?,(#(EQ,#(IN,form,,notfound),notfound,(T),(F))))
+#(SS,exists?,form,T,F)'
 
 
 Starts With
