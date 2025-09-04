@@ -1,12 +1,12 @@
 
 module TracLang
 
-  # Parser for TRAC input.  Given the input a character at a time, it 
+  # Parser for TRAC input.  Given the input a character at a time, it
   # creates an active string and then executes it when the string is
   # completed.
   class Parser
 
-    # Parses the given string and executes it, until the 
+    # Parses the given string and executes it, until the
     # active string is empty.
     def parse(str, &blk)
       @active = str
@@ -26,15 +26,15 @@ module TracLang
         self.send(@handler, @active.slice!(0), &blk)
       end
     end
-    
+
     # Add character to current expression, ignore if no expression exists
     def concat(c)
       unless @expressions.empty?
         @expressions.last.concat(c)
       end
     end
-    
-    # Handler while actively reading the active string.  If you start an expression, 
+
+    # Handler while actively reading the active string.  If you start an expression,
     # switch to the start_proc handler.  If you see an open parenthesis, switch
     # to the parens handler.  Comma marks a new argument in the current expression, and
     # end parenthesis marks the end of an expression.  When an expression is ended, execute it
@@ -55,7 +55,10 @@ module TracLang
         throw :reset if @expressions.empty?
         expression = @expressions.pop
         result = blk.call(expression)
-        if result[:force] || expression.active?
+        if result.nil?
+          print expression
+          throw :reset
+        elsif result[:force] || expression.active?
           @active.prepend(result[:value])
         else
           concat(result[:value])
@@ -86,21 +89,21 @@ module TracLang
     end
 
     # Handler for the start of an expression.  Mark the expression as active or not,
-    # depending on whether it starts with #(...) or ##(...).  
+    # depending on whether it starts with #(...) or ##(...).
     def start_proc(c, &blk)
       case c
       when '#'
         throw :reset if @expressions.empty?
         if @expressions.last.active?
           @expressions.last.active = false
-        else 
+        else
           unless @expressions.size == 1
             @expressions[-2].concat(c)
           end
         end
       when '('
         @handler = :reading
-      else 
+      else
         throw :reset if @expressions.empty?
         discard = @expressions.pop
         concat(discard.active? ? '#' : '##')

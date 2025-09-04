@@ -22,32 +22,32 @@ module TracLang
 
     # Initialize dispatch table.
     @table = {}
-    
+
     # Defines a TRAC command to be added to the dispatch table.
     # The following commands are defined.
-    # 
+    #
     # ---
     # <em>System Commands</em>
     #
-    # [on :hl] 
+    # [on :hl]
     #         Halt.  Halts the TRAC processor.
     # [on :tn]
-    #         Trace On.  While trace is on, each Expression to be executed will be displayed to the 
-    #         user first.  If the user presses return, the Expression will be executed.  If any other 
+    #         Trace On.  While trace is on, each Expression to be executed will be displayed to the
+    #         user first.  If the user presses return, the Expression will be executed.  If any other
     #         key is pressed, the active string will be cleared and the idle string will be reloaded.
     # [on :tf]
     #         Trace Off.  When trace is off, execution proceeds as normal.
     # [on :pf do |name = ''|]
     #         Print Form.  Prints the form with the given name on the console.  The form text, segments, and form pointer
     #         will all be displayed.
-    # 
+    #
     # ---
     # <em>Basic Commands</em>
     #
     # [on :ds do |name = '', value = ''|]
     #      Define String.  Creates a new Form with the given name and value, and stores it in the current set of bindings.
     # [on :eq do |str1 = '', str2 = '', t = '', f = ''|]
-    #      Equal.  Tests if two strings are equal and returns the string t or f depending on the result of the test.  Note that 
+    #      Equal.  Tests if two strings are equal and returns the string t or f depending on the result of the test.  Note that
     #      this is a string test for equality, so will not work for numerics.  To compare numerically see the greater than command.
     # [on :gr do |num1 = '', num2 = '', t = '', f = ''|]
     #      Greater Than.  Compares the given Decimal values and returns the string t or f depending on the result of the test.  To
@@ -62,11 +62,11 @@ module TracLang
     #      Read Character.  Reads a single character from the keyboard.  This will read control
     #      characters as well as printable characters.
     # [on :rs]
-    #      Read String.  Reads characters until the meta character is typed.  Primitive editing 
+    #      Read String.  Reads characters until the meta character is typed.  Primitive editing
     #      characters are available:
     #      [/] Erases the previous character
     #      [@] Erases the entire input string
-    #      The editing characters don't change the appearance of input, they just change what the 
+    #      The editing characters don't change the appearance of input, they just change what the
     #      processor eventually sees.  So for example, the following:
     #
     #      <tt>#(DD@#(PS,Hellp\o World!)'</tt>
@@ -80,20 +80,20 @@ module TracLang
     #
     # [on :dd do |*names|]
     #      Delete Definitions.  Deletes Form definitions that are bound to the given names.  Names that are
-    #      not bound will be ignored.  
+    #      not bound will be ignored.
     # [on :da]
     #      Delete all definitions.  A synonym for +#(DD,#(LN,(,)))+.
     # [on :ln do |delimiter = ''|]
-    #      List Names.  Lists names defined in the current binding using the given delimiter. The delimiter defaults 
+    #      List Names.  Lists names defined in the current binding using the given delimiter. The delimiter defaults
     #      to the empty string, which means the names will all run together.
     # [on :sb do |name, *fnames|]
-    #      Store Block.  Creates a new block with the given name and stores the given forms in it. This will 
-    #      create a file in the savedir with the name given and an extension of .trl.  The file itself will contain 
+    #      Store Block.  Creates a new block with the given name and stores the given forms in it. This will
+    #      create a file in the savedir with the name given and an extension of .trl.  The file itself will contain
     #      the TRAC commands necessary to recreate the forms given and position their form pointers to the correct place.
     # [on :fb do |name = ''|]
-    #      Fetch Block.  Fetches the block with the given name and adds its forms to this environment.  This will read the 
-    #      file given by the form value and execute each line of it as series of TRAC commands.  The contents of the block 
-    #      Form given by the name does not have to use the same directory as the +savedir+, so you can load files from other 
+    #      Fetch Block.  Fetches the block with the given name and adds its forms to this environment.  This will read the
+    #      file given by the form value and execute each line of it as series of TRAC commands.  The contents of the block
+    #      Form given by the name does not have to use the same directory as the +savedir+, so you can load files from other
     #      directories if you want. However, the Executor that is executing the TRAC commands in the file is using the +savedir+
     #      option, so if the file in question has a #(SB) command, it will use the +savedir+ in the Executor.
     # [on :eb do |name = ''|]
@@ -105,16 +105,16 @@ module TracLang
     # [on :bc do |str = ''|]
     #      Bit Complement.  Maps the mnemonic <tt>:bc</tt> to Octal.~.
     #
-    def self.on(sym)
-      table[sym] = Proc.new
+    def self.on(sym, &blk)
+      table[sym] = blk
     end
-    
+
     # Returns empty string.  All returns are wrapped in a hash containing
     # the return value and the force flag.
     def return_empty
       {value: '', force: false}
     end
-    
+
     # Returns value.  All returns are wrapped in a hash containing the return
     # value and the force flag.
     def return_value(val)
@@ -125,15 +125,15 @@ module TracLang
     def return_force(val)
       {value: val, force: true}
     end
-    
-    # Determines the TRAC mnemonic name from the given method name.  This is 
+
+    # Determines the TRAC mnemonic name from the given method name.  This is
     # used to map TRAC names to Form methods.
     def self.mnemonic(name)
       name.to_s.split('_').map {|w| w[0]}.join.to_sym
     end
 
     # Dispatches command to TRAC procedure.  If command received is a TRAC
-    # command, it's looked up in the table and executed.  If not, the #(CL) 
+    # command, it's looked up in the table and executed.  If not, the #(CL)
     # command is called, and the result is forced to the active string.
     def dispatch(exp)
       if Dispatch.table.has_key?(exp.command)
@@ -142,23 +142,23 @@ module TracLang
         self.instance_exec(*exp.args, &Dispatch.table[:cl]).merge({force: true})
       end
     end
-    
+
     # Flag for whether trace is on or off.  When trace is on,
     # each time an Expression is parsed for execution, the Executor
-    # will display the Expression and wait for user input.  If the 
+    # will display the Expression and wait for user input.  If the
     # user presses enter, TRAC proceeds as normal.  If any other key
     # is pressed, the Executor is reset.
     attr_accessor :trace
-    
-    # Directory that blocks are read from and written to.  
+
+    # Directory that blocks are read from and written to.
     attr_accessor :save_dir
-    
+
     # Meta character to end input.  When the Executor is reading from a file,
     # it will only pass the string on to the Parser after a meta character is
     # received.  Also, the TRAC #(RS) command will only return after a meta
     # character is pressed.
     attr_reader :meta
-    
+
     # Initializes environment for TRAC with a set of options.
     # Options are:
     # [bindings] Bindings to use
@@ -176,13 +176,13 @@ module TracLang
       throw :done
     end
 
-    # Trace on command.  
+    # Trace on command.
     on :tn do
       @trace = true
       return_empty
     end
-    
-    # Trace off command.  
+
+    # Trace off command.
     on :tf do
       @trace = false
       return_empty
@@ -192,19 +192,19 @@ module TracLang
     on :eq do |str1 = '', str2 = '', t = '', f = ''|
       return_force(str1 == str2 ? t : f)
     end
-    
-    # Print string command.  
+
+    # Print string command.
     on :ps do |str = ''|
       print str
       return_empty
     end
-      
+
     # Read character command.
     on :rc do
       return_value(ImmediateRead.new.getch)
     end
 
-    # Read string command.  
+    # Read string command.
     on :rs do
       str = ''
       loop do
@@ -220,18 +220,18 @@ module TracLang
       return_value(str)
     end
 
-    # Change meta command.  
+    # Change meta command.
     on :cm do |str|
       @meta = str[0] if str
       return_empty
     end
 
-    # Define string command.  
+    # Define string command.
     on :ds do |name = '', value = ''|
       @root.add([name, Form.new(value)])
       return_empty
     end
-    
+
     # Defines mapping from dispatch command to Form method.  The parameters are:
     # [sym]
     #     Method name in Form to map to.
@@ -265,7 +265,7 @@ module TracLang
     def self.dispatch_form(sym, type, pos = -1)
       table[mnemonic(sym)] = Proc.new do |name = '', *args|
         f = @root.fetch(name)
-        if !f 
+        if !f
           return_empty
         else
           case type
@@ -293,31 +293,31 @@ module TracLang
     dispatch_form(:call_segment, :rescuing_eos_at, 0)
     dispatch_form(:call_n, :rescuing_eos_at, 1)
     dispatch_form(:in_neutral, :rescuing_eos_at, 1)
-    
-    # Print form command.  
+
+    # Print form command.
     on :pf do |name = ''|
       f = @root.fetch(name)
       puts f if f
       return_empty
     end
-    
+
     # Delete definitions command.
     on :dd do |*names|
       names.each { |name| @root.delete(name) }
       return_empty
     end
-    
+
     # Delete all command.
-    on :da do 
+    on :da do
       @root.clear
       return_empty
     end
-    
+
     # List names command.
     on :ln do |delimiter = ''|
       return_value(@root.map { |n, v| n }.join(delimiter))
     end
-  
+
     # Store block command.
     on :sb do |name, *fnames|
       if name
@@ -330,7 +330,7 @@ module TracLang
       end
       return_empty
     end
-  
+
     # Fetch block command.
     on :fb do |name = ''|
       f = @root.fetch(name)
@@ -373,7 +373,7 @@ module TracLang
         end
       end
     end
-  
+
     on :ad, &dispatch_to_decimal(:+)
     on :su, &dispatch_to_decimal(:-)
     on :ml, &dispatch_to_decimal(:*)
@@ -389,7 +389,7 @@ module TracLang
         return_value(o1.send(symbol, o2).to_s)
       end
     end
-  
+
     on :bu, &dispatch_to_octal(:|)
     on :bi, &dispatch_to_octal(:&)
 
@@ -412,7 +412,7 @@ module TracLang
         end
       end
     end
-  
+
     on :bs, &dispatch_to_mixed(:shift)
     on :br, &dispatch_to_mixed(:rotate)
 
