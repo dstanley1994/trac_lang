@@ -40,12 +40,13 @@ def print_error(error)
     puts USAGE_INSTRUCTIONS
   else
     puts "An unexpected error occured while running TRAC Lang"
-    puts "  #{error}\n"
+    puts "  #{error.class} #{error}\n"
+    puts error.backtrace.join("\n")
   end
 end
 
 begin 
-  d = TracLang::Dispatch.new(parse_options)
+  d = TracLang::Dispatch.new(**parse_options)
   e = TracLang::Executor.new(d)
   catch :done do
     last_file = ''
@@ -68,7 +69,7 @@ begin
   end
   puts 'Exiting...'
   puts
-rescue => error
+rescue StandardError => error
   print_error(error)
   exit(false)
 end
